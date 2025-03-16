@@ -1,108 +1,91 @@
-## Medchain :
-Medchain is a Blockchain-based Electronic health Record Storage and Retrieval System.
+# MedChain - Project Setup Guide
 
-- Blockchain Technology with the help of **IPFS** Provides the Required Safety For Maintaining Record.
+## Prerequisites
+Before setting up the project, ensure that you have the following installed:
 
-- Securely Store Your Sensitive Data Such As Health Record.
+1. **Ganache** - A personal Ethereum blockchain for development.
+2. **Truffle** - A development framework for Ethereum smart contracts.
+3. **IPFS** - A decentralized storage system for managing files.
+4. **MetaMask** - A browser extension for managing Ethereum accounts and connecting to the blockchain.
 
-- Only Let Your Trusted Doctors To View Your Medical Records.
+## Installation and Setup
 
-### <u>EASY STEPS :</u>
+### 1. Install Ganache
+Ganache is required to simulate a blockchain locally.
 
-> ***Register Yourself :***
-Register yourself to the locker, secured by blockchain technology.
+- Download and install Ganache from: [Ganache Download](https://trufflesuite.com/ganache/)
+- Start Ganache and create a new workspace if necessary.
 
-> ***Authenticate Yourself :***
-Log In with your credentials.
+### 2. Install Truffle
+Truffle helps in compiling and deploying smart contracts.
 
-> ***Upload your Data :***
-Create, update, or view your health record information.
+Run the following command:
+```sh
+npm install -g truffle
+```
 
-### <u>PROBLEMS WE FACED :</u>
+### 3. Install IPFS
+IPFS is used for decentralized file storage.
 
-- Getting problems in maintaining and organizing your medical records, before consulting your Doctor.
+- Download and install the **IPFS Desktop GUI** from: [IPFS Desktop](https://docs.ipfs.tech/install/ipfs-desktop/)
+- Open the IPFS Desktop application and ensure it is running.
 
-- People usually don't go for regular checkup due to unorganised medical record which may lead to chronic disease in future.
+### 4. Project Structure
+The project consists of two main directories:
 
-- Missing even one prescription can lead to wrong interpretation.
+- **`safe/`** - The frontend React application.
+- **`backend/`** - The Solidity smart contracts and blockchain-related logic.
 
-- Medical records can be used to submit false insurance claims or to receive unauthorized medical treatment.
+### 5. Install Dependencies
+Navigate to both `safe/` and `backend/` directories and install dependencies using:
 
-- Some individuals or organizations may sell stolen medical records on the black market for profit.
+```sh
+npm install --legacy-peer-deps
+```
 
-### <u>OUR SERVICES :</u>
+### 6. Setup MetaMask
+MetaMask is needed to interact with the Ethereum blockchain.
 
-1. ***Maintaining Medical Records :***
-Keep track of your medical records, enabled by blockchain technology.
+1. Install the [MetaMask Extension](https://metamask.io/download/) for your browser.
+2. Open MetaMask and select **Import Account**.
+3. Copy the first private key from Ganache and paste it into MetaMask’s **Import Account** section.
 
-2. ***Connect With Doctors :***
-Share your records with our trusted medical experts, to get a prescription.
+### 7. Run Ganache
+Start Ganache and keep it running to simulate the blockchain.
 
-3. ***Disease Prediction Model :***
-Get a precautionary alert about diseases you might suffer from, based on our ML model.
+### 8. Run IPFS
+Ensure IPFS is running by opening the **IPFS Desktop GUI**.
 
-### <u>WORKING :</u>
+### 9. Compile and Migrate Smart Contracts
+Navigate to the `backend/` directory and run:
 
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/9.png?raw=true)
+```sh
+truffle compile
+truffle migrate --reset
+```
 
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/10.png?raw=true)
+This will compile and deploy the smart contracts to the local blockchain (Ganache).
 
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/11.png?raw=true)
+### 10. Configure MetaMask Network
+After running Ganache, configure MetaMask to use the local blockchain:
 
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/12.png?raw=true)
+- Open MetaMask.
+- Click on **Networks** > **Add Network**.
+- Set the following values:
+  - **Network Name**: Ganache
+  - **New RPC URL**: `http://127.0.0.1:8545`
+  - **Chain ID**: `1337`
+  - **Currency Symbol**: ETH
 
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/13.png?raw=true)
+### 11. Start the Frontend Application
+Navigate to the `safe/` directory and start the frontend:
 
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/14.png?raw=true)
+```sh
+npm start
+```
 
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/15.png?raw=true)
+This will launch the application in the browser.
 
-### <u>IPFS INTEGRATION :</u>
+## Summary
+By following the above steps, you will have successfully set up and run the MedChain project, integrating blockchain and decentralized storage with a React frontend.
 
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/5.png?raw=true)
-
-![](https://github.com/Kraniket901/Medchain/blob/master/safe/public/6.png?raw=true)
-
-### <u>MARKETING GOALS :</u>
-
-> ***Offer User-Friendly Platform :***
-Develop a user-friendly platform that is easy to use and understand for both patients and doctors. Offer training and support to help users get the most out of the platform, and gather feedback to continuously improve the user experience.
-
-> ***Emphasize the Security Benefits :***
-The key selling point of this technology is the increased security it provides for medical records. Emphasize the importance of having a secure and encrypted platform for storing and sharing sensitive medical information.
-
-> ***Target Patients and Doctors :***
-Identify both patients and doctors as your target audience. Patients will appreciate the ability to have control over their own medical records, while doctors will appreciate the ease and efficiency of accessing these records.
-
-> ***Collaborate with Healthcare Providers :***
-Collaborate with healthcare providers to offer a complete solution for medical record management. This will help to build credibility and demonstrate the value of your technology.
-
-### <u>FUTURE ASPECTS :</u>
-
-1. Doctor Treating The Patient Can Update Their Record And Prescribe Medicines.
-
-2. User Can Directly Talk / Chat With The Doctor They Want On Our Site.
-
-3. The System Can Be Automated To Gather Data Using The Report Uploaded By The User.
-
-4. We Will Create a Multi-Platform Application For Better User Experience.
-
-5. The Prediction Model Can Be Further Trained For Better Accuracy
-
-### <u>TECH STACKS USED :</u>
-
-- IPFS
-- Ganache
-- Solidity
-- MetaMask
-- Flask
-- React
-- Tailwind CSS
-
-### <u>TEAM THE BOYS :</u>
-
->Viraj Chandra (Frontend)
-Piyush Kumar (Backend)
-Vibhor Singh (ML)
-Aniket Kumar (Frontend)
-Anurag Deo (Frontend)
