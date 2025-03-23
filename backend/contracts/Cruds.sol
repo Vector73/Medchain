@@ -2,43 +2,22 @@
 pragma solidity ^0.8.19;
 
 contract Cruds {
-    string[] doctors;
-    string[] patients;
+    mapping(address => string) private patientCIDs;  // Maps a patient address to an array of CIDs
+    mapping(address => string) private doctorCIDs;     // Maps a doctor address to a single CID
 
     function addDoctor(string memory doc_cid) public {
-        for (uint i = 0; i < doctors.length; i++) {
-            string memory x = doctors[i];
-            if (keccak256(bytes(x)) == keccak256(bytes(doc_cid))) return;
-        }
-        doctors.push(doc_cid);
+        doctorCIDs[msg.sender] = doc_cid;  // Each doctor has a unique CID
     }
 
-    function getDoctor() public view returns (string[] memory) {
-        return doctors;
+    function getDoctor(address doctorAddress) public view returns (string memory) {
+        return doctorCIDs[doctorAddress];  // Get doctor CID by address
     }
 
     function addPatient(string memory patient_cid) public {
-        uint index = patients.length;
-        
-        // Check if the CID already exists and get its index
-        for (uint i = 0; i < patients.length; i++) {
-            if (keccak256(bytes(patients[i])) == keccak256(bytes(patient_cid))) {
-                index = i;
-                break;
-            }
-        }
-
-        // Shift all elements to remove the existing hash
-        for (uint i = index; i < patients.length - 1; i++) {
-            patients[i] = patients[i + 1];
-        }
-
-
-        // Add the new CID at the end
-        patients.push(patient_cid);
+        patientCIDs[msg.sender] = patient_cid;  // Append new CID for the patient
     }
 
-    function getPatient() public view returns (string[] memory) {
-        return patients;
+    function getPatient(address patientAddress) public view returns (string memory) {
+        return patientCIDs[patientAddress];  // Return all CIDs for a given patient
     }
 }

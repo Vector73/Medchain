@@ -1,5 +1,5 @@
 {
-  "address": "0xE4c47129FcceAd2fA90C45dE3fBc2507f51A9B92",
+  "address": "0xC2C5471ca6000fBafB6a42B76ccefe017Be165d8",
   "abi": [
     {
       "inputs": [
@@ -15,13 +15,19 @@
       "type": "function"
     },
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "doctorAddress",
+          "type": "address"
+        }
+      ],
       "name": "getDoctor",
       "outputs": [
         {
-          "internalType": "string[]",
+          "internalType": "string",
           "name": "",
-          "type": "string[]"
+          "type": "string"
         }
       ],
       "stateMutability": "view",
@@ -42,13 +48,19 @@
       "type": "function"
     },
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "patientAddress",
+          "type": "address"
+        }
+      ],
       "name": "getPatient",
       "outputs": [
         {
-          "internalType": "string[]",
+          "internalType": "string",
           "name": "",
-          "type": "string[]"
+          "type": "string"
         }
       ],
       "stateMutability": "view",

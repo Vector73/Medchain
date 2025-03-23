@@ -41,30 +41,36 @@ const MedicalHistory = () => {
   useEffect(() => {
     async function fetchMedicalHistory() {
       if (!walletAddress) return;
+  
       try {
-        const res = await mycontract.methods.getPatient().call();
-        let patientHash = null;
-        for (let i = 0; i < res.length; i++) {
-          try {
-            const response = await fetch(`http://localhost:8080/ipfs/${res[i]}`);
-            if (!response.ok) continue;
-            const data = await response.json();
-            if (data.wallet && data.wallet.toLowerCase() === walletAddress.toLowerCase()) {
-              patientHash = res[i];
-            }
-          } catch (err) {
-            console.error("Error fetching record:", err);
-          }
-        }
-        if (!patientHash) {
+        // Get the latest CID directly from the smart contract
+        const patientCIDs = await mycontract.methods.getPatient(walletAddress).call();
+  
+        if (!patientCIDs || patientCIDs.length === 0) {
           console.log("No patient record found for this user.");
           return;
         }
-        // Store hash in cookie
-        setCookie("hash", patientHash);
-        const response = await fetch(`http://localhost:8080/ipfs/${patientHash}`);
+  
+        // Retrieve the latest CID from the array (last index)
+        const latestCID = patientCIDs;
+        console.log(latestCID)
+  
+        console.log("Latest CID:", latestCID);
+  
+        // Fetch medical history from IPFS
+        const response = await fetch(`http://localhost:8080/ipfs/${latestCID}`);
+        if (!response.ok) {
+          console.error("Failed to fetch medical history from IPFS");
+          return;
+        }
+  
         const data = await response.json();
         console.log("Fetched Medical History:", data);
+  
+        // Store the latest hash in a cookie
+        setCookie("hash", latestCID, { path: "/" });
+        await mycontract.methods.addPatient(latestCID).call();
+        // Update state
         if (data && data.medicalhistory) {
           setMedHistory(data.medicalhistory);
         }
@@ -72,21 +78,23 @@ const MedicalHistory = () => {
         console.error("Error fetching medical history:", error);
       }
     }
+  
     fetchMedicalHistory();
   }, [walletAddress, setCookie]);
-
+  
   const handleFormChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
-
+  
   // Update blockchain with new medical history (preserving other data)
   const updateBlockchain = async (updatedHistory) => {
     const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-    const client = create(new URL('http://127.0.0.1:5001'));
+    const client = create(new URL("http://127.0.0.1:5001"));
   
-    // Get the current hash from cookie (if exists)
+    // Get the latest CID from cookie
     let currentHash = cookies["hash"];
     let existingData = {};
+  
     if (currentHash) {
       try {
         const res = await fetch(`http://localhost:8080/ipfs/${currentHash}`);
@@ -96,10 +104,10 @@ const MedicalHistory = () => {
       }
     }
   
-    // Merge existing data with updated medical history. Also, ensure we include wallet field.
+    // Merge existing data with updated medical history
     const newData = {
       ...existingData,
-      wallet: walletAddress, // persist wallet address in data
+      wallet: walletAddress, // Ensure wallet address is persisted
       medicalhistory: updatedHistory,
     };
   
@@ -107,16 +115,20 @@ const MedicalHistory = () => {
     const { cid } = await client.add(JSON.stringify(newData));
     const newHash = cid.toString();
   
-    // Since we cannot change the smart contract, we use the existing addPatient() function.
-    console.log(newHash, currentHash)
-    await mycontract.methods.addPatient(newHash).send({ from: accounts[0] });
-    const patientCIDs = await mycontract.methods.getPatient().call();
-    console.log(patientCIDs)
+    console.log("New CID:", newHash, "Previous CID:", currentHash);
   
-    // Update cookie and state
-    setCookie("hash", newHash);
+    // Store new CID on the blockchain (adds it to the user's CID list)
+    await mycontract.methods.addPatient(newHash).send({ from: accounts[0] });
+  
+    // Fetch updated list of CIDs to verify update
+    const patientCIDs = await mycontract.methods.getPatient(walletAddress).call();
+    console.log("Updated Patient CIDs:", patientCIDs);
+  
+    // Update cookie and state with the latest hash
+    setCookie("hash", newHash, { path: "/" });
     setMedHistory(updatedHistory);
   };
+  
   
   const submit = async () => {
     const updatedHistory = editingIndex !== null

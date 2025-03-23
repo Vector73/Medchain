@@ -8,6 +8,7 @@ const Auth = () => {
   const [account, setAccount] = useState(null);
   const [userType, setUserType] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies(["hash"]);
   const navigate = useNavigate();
 
@@ -16,71 +17,67 @@ const Auth = () => {
   }, []);
 
   const connectWallet = async () => {
-    if (window.ethereum) {
-      try {
-        const web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        setAccount(accounts[0]);
-        fetchUserData(web3, accounts[0]);
-      } catch (error) {
-        setError("MetaMask connection failed");
-      }
-    } else {
-      setError("MetaMask not detected");
+    if (!window.ethereum) {
+      setError("MetaMask not detected. Please install MetaMask.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const web3 = new Web3(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      const accounts = await web3.eth.getAccounts();
+      setAccount(accounts[0]);
+
+      // Fetch user type and CID from blockchain
+      await fetchUserData(web3, accounts[0]);
+    } catch (error) {
+      setError("MetaMask connection failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchUserData = async (web3, walletAddress) => {
     try {
       const myContract = new web3.eth.Contract(contract.abi, contract.address);
-      const patientCIDs = await myContract.methods.getPatient().call();
-      const doctorCIDs = await myContract.methods.getDoctor().call();
-      
+
+      // Get the latest CID directly from blockchain mappings
+      const patientCIDs = await myContract.methods.getPatient(walletAddress).call();
+      console.log("Patient CIDs:", patientCIDs);
+      const doctorCIDs = await myContract.methods.getDoctor(walletAddress).call();
+
+      console.log("Doctor CIDs:", doctorCIDs);
+
       let userHash = null;
       let userType = null;
-      console.log(patientCIDs)
-      for (const cid of patientCIDs) {
-        try {
-          const response = await fetch(`http://localhost:8080/ipfs/${cid}`);
-          if (!response.ok) continue;
-          const data = await response.json();
-          if (data.wallet && data.wallet.toLowerCase() === walletAddress.toLowerCase()) {
-            userHash = cid;
-            userType = "patient";
-          }
-        } catch (err) {
-          console.error("Error fetching record:", err);
-        }
-      }
+
+      // Check for the latest patient CID
+      if (patientCIDs.length > 0) {
+        userHash = patientCIDs; // Latest patient record
+        userType = "patient";
+      } 
       
-      if (!userHash) {
-        for (const cid of doctorCIDs) {
-          try {
-            const response = await fetch(`http://localhost:8080/ipfs/${cid}`);
-            if (!response.ok) continue;
-            const data = await response.json();
-            if (data.wallet && data.wallet.toLowerCase() === walletAddress.toLowerCase()) {
-              userHash = cid;
-              userType = "doctor";
-            }
-          } catch (err) {
-            console.error("Error fetching record:", err);
-          }
-        }
+      // Check for the latest doctor CID if not found in patients
+      else if (doctorCIDs.length > 0) {
+        userHash = doctorCIDs[doctorCIDs.length - 1]; // Latest doctor record
+        userType = "doctor";
       }
-      
+
       if (!userHash) {
         setError("User not found. Please register first.");
         return;
       }
-      
-      setCookie("hash", userHash);
+
+      // Save the latest CID in cookies
+      setCookie("hash", userHash, { path: "/" });
+
+      // Navigate based on user role
       setUserType(userType);
       navigate(userType === "patient" ? "/patient-dashboard" : "/doctor-dashboard");
     } catch (error) {
       console.error("Error fetching user data:", error);
-      setError("Error fetching user data");
+      setError("Error fetching user data. Please try again.");
     }
   };
 
@@ -88,7 +85,9 @@ const Auth = () => {
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-teal-400 text-white p-6">
       <div className="bg-white text-gray-900 shadow-lg rounded-lg p-8 max-w-md w-full text-center">
         <h2 className="text-2xl font-semibold mb-4">Login with MetaMask</h2>
-        {account ? (
+        {loading ? (
+          <p className="text-lg font-medium text-gray-600">Connecting...</p>
+        ) : account ? (
           <p className="text-lg font-medium">Connected as: <span className="text-blue-600">{account}</span></p>
         ) : (
           <button 
