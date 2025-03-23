@@ -28,8 +28,8 @@ const App = () => {
               <Routes>
                 {/* dashboard  */}
                 <Route path="/" element={(<Home />)} />
-                <Route path="/myprofile" element={(<MyProfile />)} />
-                <Route path="/myprofiledoc" element={(<MyProfileDoc />)} />
+                <Route path="/patient-dashboard" element={(<MyProfile />)} />
+                <Route path="/doctor-dashboard" element={(<MyProfileDoc />)} />
                 <Route path="/login" element={(<Login />)} />
                 <Route path="/signup" element={(<Signup />)} />
 
