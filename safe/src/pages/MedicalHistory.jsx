@@ -9,6 +9,7 @@ import { create } from 'ipfs-http-client';
 import { Modal, Box, Button, TextField, Table, TableHead, TableRow, TableCell, TableBody, MenuItem, Typography, TableContainer, Paper } from "@mui/material";
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
+import { fetchData, updateBlockchainUtil } from "./components/util";
 
 const MedicalHistory = () => {
   const [cookies, setCookie] = useCookies();
@@ -28,7 +29,6 @@ const MedicalHistory = () => {
   });
   const [walletAddress, setWalletAddress] = useState("");
 
-  // Get user's wallet address on mount.
   useEffect(() => {
     async function fetchAccount() {
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -37,94 +37,25 @@ const MedicalHistory = () => {
     fetchAccount();
   }, []);
 
-  // Fetch patient record by finding the one whose JSON wallet matches the user's wallet.
   useEffect(() => {
     async function fetchMedicalHistory() {
-      if (!walletAddress) return;
-  
-      try {
-        // Get the latest CID directly from the smart contract
-        const patientCIDs = await mycontract.methods.getPatient(walletAddress).call();
-  
-        if (!patientCIDs || patientCIDs.length === 0) {
-          console.log("No patient record found for this user.");
-          return;
-        }
-  
-        // Retrieve the latest CID from the array (last index)
-        const latestCID = patientCIDs;
-        console.log(latestCID)
-  
-        console.log("Latest CID:", latestCID);
-  
-        // Fetch medical history from IPFS
-        const response = await fetch(`http://localhost:8080/ipfs/${latestCID}`);
-        if (!response.ok) {
-          console.error("Failed to fetch medical history from IPFS");
-          return;
-        }
-  
-        const data = await response.json();
-        console.log("Fetched Medical History:", data);
-  
-        // Store the latest hash in a cookie
-        setCookie("hash", latestCID, { path: "/" });
-        await mycontract.methods.addPatient(latestCID).call();
-        // Update state
+        const {patientCID, data} = await fetchData(walletAddress);
+        setCookie("hash", patientCID, { path: "/" });
         if (data && data.medicalhistory) {
-          setMedHistory(data.medicalhistory);
+            setMedHistory(data.medicalhistory);
         }
-      } catch (error) {
-        console.error("Error fetching medical history:", error);
-      }
     }
+    fetchMedicalHistory()
   
-    fetchMedicalHistory();
   }, [walletAddress, setCookie]);
   
   const handleFormChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
   
-  // Update blockchain with new medical history (preserving other data)
   const updateBlockchain = async (updatedHistory) => {
-    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-    const client = create(new URL("http://127.0.0.1:5001"));
+    const newHash = await updateBlockchainUtil(walletAddress, {medicalhistory: updatedHistory}, cookies["hash"])
   
-    // Get the latest CID from cookie
-    let currentHash = cookies["hash"];
-    let existingData = {};
-  
-    if (currentHash) {
-      try {
-        const res = await fetch(`http://localhost:8080/ipfs/${currentHash}`);
-        existingData = await res.json();
-      } catch (error) {
-        console.error("Error fetching existing IPFS data:", error);
-      }
-    }
-  
-    // Merge existing data with updated medical history
-    const newData = {
-      ...existingData,
-      wallet: walletAddress, // Ensure wallet address is persisted
-      medicalhistory: updatedHistory,
-    };
-  
-    // Upload updated data to IPFS
-    const { cid } = await client.add(JSON.stringify(newData));
-    const newHash = cid.toString();
-  
-    console.log("New CID:", newHash, "Previous CID:", currentHash);
-  
-    // Store new CID on the blockchain (adds it to the user's CID list)
-    await mycontract.methods.addPatient(newHash).send({ from: accounts[0] });
-  
-    // Fetch updated list of CIDs to verify update
-    const patientCIDs = await mycontract.methods.getPatient(walletAddress).call();
-    console.log("Updated Patient CIDs:", patientCIDs);
-  
-    // Update cookie and state with the latest hash
     setCookie("hash", newHash, { path: "/" });
     setMedHistory(updatedHistory);
   };
