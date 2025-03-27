@@ -4,18 +4,29 @@ import { useCookies } from "react-cookie";
 import { useStateContext } from "../contexts/ContextProvider";
 
 const Navbar = () => {
-  const { activeMenu, setActiveMenu, setScreenSize, screenSize } = useStateContext();
+  const { activeMenu, setActiveMenu, setScreenSize, screenSize } =
+    useStateContext();
   const [cookies, , removeCookie] = useCookies();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  
+
   const userName = cookies.name || "User";
   const userType = cookies.userType ? cookies.userType.toUpperCase() : "USER";
 
   // Handle logout
   const logout = () => {
-    ["temporary", "name", "mail", "index", "password", "patients", "doctors", "insurance", "type", "allergies"]
-      .forEach(removeCookie);
+    [
+      "temporary",
+      "name",
+      "mail",
+      "index",
+      "password",
+      "patients",
+      "doctors",
+      "insurance",
+      "type",
+      "allergies",
+    ].forEach(removeCookie);
 
     window.location.href = "/";
   };

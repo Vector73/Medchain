@@ -30,7 +30,7 @@ const MyProfileDoctor = () => {
   const web3 = new Web3(window.ethereum);
   const mycontract = new web3.eth.Contract(
     contract["abi"],
-    contract["address"]
+    contract["address"],
   );
   const [cookies, setCookie] = useCookies();
   const [profile, setProfile] = useState({

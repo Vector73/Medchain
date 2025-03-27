@@ -2,14 +2,13 @@ import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Ecommerce from "./Ecommerce";
-import { FiSettings } from 'react-icons/fi';
-import { TooltipComponent } from '@syncfusion/ej2-react-popups';
+import { FiSettings } from "react-icons/fi";
+import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
 import ThemeSettings from "../components/ThemeSettings";
-
 
 const Dashboard = () => {
   return (
@@ -47,24 +46,23 @@ const Dashboard = () => {
         </div>
         <div>
           {themeSettings && <ThemeSettings />}
-        <BrowserRouter>
-
-          <Routes>
-            {/* dashboard  */}
-            <Route path="/patient-dashboard" element={<Ecommerce />} />
-            {/* pages 
+          <BrowserRouter>
+            <Routes>
+              {/* dashboard  */}
+              <Route path="/patient-dashboard" element={<Ecommerce />} />
+              {/* pages 
             <Route path="/orders" element={<Orders />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/customers" element={<Customers />} />
 
             {/* apps  */}
-            {/* <Route path="/kanban" element={<Kanban />} />
+              {/* <Route path="/kanban" element={<Kanban />} />
             <Route path="/editor" element={<Editor />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/color-picker" element={<ColorPicker />} />
 
             {/* charts  */}
-            {/* <Route path="/line" element={<Line />} />
+              {/* <Route path="/line" element={<Line />} />
             <Route path="/area" element={<Area />} />
             <Route path="/bar" element={<Bar />} />
             <Route path="/pie" element={<Pie />} />
@@ -72,8 +70,8 @@ const Dashboard = () => {
             <Route path="/color-mapping" element={<ColorMapping />} />
             <Route path="/pyramid" element={<Pyramid />} />
             <Route path="/stacked" element={<Stacked />} /> */}
-          </Routes>
-        </BrowserRouter>
+            </Routes>
+          </BrowserRouter>
         </div>
         <Footer />
       </div>

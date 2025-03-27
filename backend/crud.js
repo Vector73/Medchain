@@ -1,9 +1,11 @@
-let Web3 = require('web3');
-let Solc = require('solc');
+let Web3 = require("web3");
+let Solc = require("solc");
 let web3 = new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:8545"));
-const fs = require('fs');
+const fs = require("fs");
 
-const sourceCode = fs.readFileSync('C:\\Users\\HP\\Desktop\\safe\\backend\\contracts\\Cruds.sol').toString();
+const sourceCode = fs
+  .readFileSync("C:\\Users\\HP\\Desktop\\safe\\backend\\contracts\\Cruds.sol")
+  .toString();
 
 const compiledCode = Solc.compile(sourceCode, 1);
 // const contractABI = JSON.parse(compiledCode.contracts['Cruds'].interface);

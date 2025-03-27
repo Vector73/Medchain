@@ -1,101 +1,104 @@
-import React from 'react';
-import { BsCurrencyDollar } from 'react-icons/bs';
-import { CgProfile } from 'react-icons/cg';
-import { FaAllergies } from 'react-icons/fa';
-import { IoDocumentOutline} from 'react-icons/io5';
-import { MdOutlineMeetingRoom, MdOutlineMedicalServices, MdMedicalServices} from 'react-icons/md';
-
+import React from "react";
+import { BsCurrencyDollar } from "react-icons/bs";
+import { CgProfile } from "react-icons/cg";
+import { FaAllergies } from "react-icons/fa";
+import { IoDocumentOutline } from "react-icons/io5";
+import {
+  MdOutlineMeetingRoom,
+  MdOutlineMedicalServices,
+  MdMedicalServices,
+} from "react-icons/md";
 
 export const links = [
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     links: [
       {
-        name: 'patient-dashboard',
-        title: 'My Profile',
+        name: "patient-dashboard",
+        title: "My Profile",
         icon: <CgProfile />,
       },
     ],
   },
-  
+
   {
-    title: 'Health Records',
+    title: "Health Records",
     links: [
       {
-        name: 'insurance',
+        name: "insurance",
         icon: <IoDocumentOutline />,
       },
       {
-        name: 'allergies',
+        name: "allergies",
         icon: <FaAllergies />,
       },
       {
-        name: 'medical history',
+        name: "medical history",
         icon: <MdOutlineMedicalServices />,
       },
       {
-        name: 'hospitalization history',
+        name: "hospitalization history",
         icon: <MdMedicalServices />,
       },
       {
-        name: 'checkup history',
-        icon: <MdOutlineMeetingRoom/>,
-      }
+        name: "checkup history",
+        icon: <MdOutlineMeetingRoom />,
+      },
     ],
   },
   {
-    title: 'Available Doctors',
+    title: "Available Doctors",
     links: [
       {
-        name: 'doctors',
+        name: "doctors",
         icon: <MdOutlineMedicalServices />,
       },
     ],
   },
   {
-    title: 'Feeling Low?',
+    title: "Feeling Low?",
     links: [
       {
-        name: 'predict disease',
+        name: "predict disease",
         icon: <MdOutlineMedicalServices />,
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];
 
 export const themeColors = [
   {
-    name: 'blue-theme',
-    color: '#1A97F5',
+    name: "blue-theme",
+    color: "#1A97F5",
   },
   {
-    name: 'green-theme',
-    color: '#03C9D7',
+    name: "green-theme",
+    color: "#03C9D7",
   },
   {
-    name: 'purple-theme',
-    color: '#7352FF',
+    name: "purple-theme",
+    color: "#7352FF",
   },
   {
-    name: 'red-theme',
-    color: '#FF5C8E',
+    name: "red-theme",
+    color: "#FF5C8E",
   },
   {
-    name: 'indigo-theme',
-    color: '#1E4DB7',
+    name: "indigo-theme",
+    color: "#1E4DB7",
   },
   {
-    color: '#FB9678',
-    name: 'orange-theme',
+    color: "#FB9678",
+    name: "orange-theme",
   },
 ];
 
 export const userProfileData = [
   {
     icon: <BsCurrencyDollar />,
-    title: 'My Profile',
-    desc: 'Account Settings',
-    iconColor: '#03C9D7',
-    iconBg: '#E5FAFB',
+    title: "My Profile",
+    desc: "Account Settings",
+    iconColor: "#03C9D7",
+    iconBg: "#E5FAFB",
   },
 ];

@@ -14,11 +14,11 @@ const sourceCode = fs.readFileSync(contractPath, "utf8");
 
 // Solidity Compiler Input
 const input = {
-    language: "Solidity",
-    sources: {
-        "Cruds.sol": { content: sourceCode }
-    },
-    settings: { outputSelection: { "*": { "*": ["abi", "evm.bytecode"] } } }
+  language: "Solidity",
+  sources: {
+    "Cruds.sol": { content: sourceCode },
+  },
+  settings: { outputSelection: { "*": { "*": ["abi", "evm.bytecode"] } } },
 };
 
 // Compile Solidity Contract
@@ -28,28 +28,33 @@ const contractABI = contract.abi;
 const bytecode = contract.evm.bytecode.object;
 
 async function deployContract() {
-    try {
-        // Get available accounts
-        const accounts = await web3.eth.getAccounts();
-        const deployer = accounts[0]; // First account will deploy the contract
+  try {
+    // Get available accounts
+    const accounts = await web3.eth.getAccounts();
+    const deployer = accounts[0]; // First account will deploy the contract
 
-        console.log("Deploying from account:", deployer);
+    console.log("Deploying from account:", deployer);
 
-        // Create contract instance
-        const contractInstance = new web3.eth.Contract(contractABI);
+    // Create contract instance
+    const contractInstance = new web3.eth.Contract(contractABI);
 
-        // Deploy the contract
-        const deployedContract = await contractInstance.deploy({
-            data: bytecode
-        }).send({
-            from: deployer,
-            gas: 4700000
-        });
+    // Deploy the contract
+    const deployedContract = await contractInstance
+      .deploy({
+        data: bytecode,
+      })
+      .send({
+        from: deployer,
+        gas: 4700000,
+      });
 
-        console.log("Contract deployed at address:", deployedContract.options.address);
-    } catch (error) {
-        console.error("Deployment failed:", error);
-    }
+    console.log(
+      "Contract deployed at address:",
+      deployedContract.options.address,
+    );
+  } catch (error) {
+    console.error("Deployment failed:", error);
+  }
 }
 
 // Deploy the contract

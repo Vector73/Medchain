@@ -6,14 +6,26 @@ import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
 import contract from "../contracts/contract.json";
 import { useCookies } from "react-cookie";
-import { create } from 'ipfs-http-client';
-import { 
-  Modal, Box, Button, TextField, Table, TableHead, TableRow, 
-  TableCell, TableBody, MenuItem, Typography, TableContainer, 
-  Paper, Chip, CircularProgress 
+import { create } from "ipfs-http-client";
+import {
+  Modal,
+  Box,
+  Button,
+  TextField,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  MenuItem,
+  Typography,
+  TableContainer,
+  Paper,
+  Chip,
+  CircularProgress,
 } from "@mui/material";
-import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css';
+import SimpleBar from "simplebar-react";
+import "simplebar-react/dist/simplebar.min.css";
 import { fetchData, updateBlockchainUtil } from "./components/util";
 
 const HospitalizationHistory = () => {
@@ -41,7 +53,9 @@ const HospitalizationHistory = () => {
   // Initialize web3 connection
   useEffect(() => {
     async function fetchAccount() {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
       setWalletAddress(accounts[0]);
     }
     fetchAccount();
@@ -49,25 +63,28 @@ const HospitalizationHistory = () => {
 
   useEffect(() => {
     async function fetchHospitalizationHistory() {
-        const {patientCID, data} = await fetchData(walletAddress);
-        setCookie("hash", patientCID, { path: "/" });
-        if (data && data.hospitalizationhistory) {
-            setHospitalizationHistory(data.hospitalizationhistory);
-        }
+      const { patientCID, data } = await fetchData(walletAddress);
+      setCookie("hash", patientCID, { path: "/" });
+      if (data && data.hospitalizationhistory) {
+        setHospitalizationHistory(data.hospitalizationhistory);
+      }
     }
     setLoading(true);
-    fetchHospitalizationHistory()
+    fetchHospitalizationHistory();
     setLoading(false);
-  
   }, [walletAddress, setCookie]);
-  
+
   const handleFormChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
-  
+
   const updateBlockchain = async (updatedHistory) => {
-    const newHash = await updateBlockchainUtil(walletAddress, {hospitalizationhistory: updatedHistory}, cookies["hash"])
-  
+    const newHash = await updateBlockchainUtil(
+      walletAddress,
+      { hospitalizationhistory: updatedHistory },
+      cookies["hash"],
+    );
+
     setCookie("hash", newHash, { path: "/" });
     setHospitalizationHistory(updatedHistory);
   };
@@ -79,22 +96,25 @@ const HospitalizationHistory = () => {
       return;
     }
 
-    const updatedHistory = editingIndex !== null
-      ? hospitalizationHistory.map((rec, i) => (i === editingIndex ? formData : rec))
-      : [...hospitalizationHistory, formData];
-    
+    const updatedHistory =
+      editingIndex !== null
+        ? hospitalizationHistory.map((rec, i) =>
+            i === editingIndex ? formData : rec,
+          )
+        : [...hospitalizationHistory, formData];
+
     await updateBlockchain(updatedHistory);
     setOpenForm(false);
     setEditingIndex(null);
-    setFormData({ 
-      reason: "", 
-      admissionDate: "", 
-      dischargeDate: "", 
-      hospital: "", 
-      doctor: "", 
-      ward: "", 
-      treatment: "", 
-      notes: "" 
+    setFormData({
+      reason: "",
+      admissionDate: "",
+      dischargeDate: "",
+      hospital: "",
+      doctor: "",
+      ward: "",
+      treatment: "",
+      notes: "",
     });
   };
 
@@ -106,7 +126,9 @@ const HospitalizationHistory = () => {
 
   const deleteRecord = async (index) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
-      const updatedHistory = hospitalizationHistory.filter((_, i) => i !== index);
+      const updatedHistory = hospitalizationHistory.filter(
+        (_, i) => i !== index,
+      );
       await updateBlockchain(updatedHistory);
     }
   };
@@ -124,10 +146,10 @@ const HospitalizationHistory = () => {
     if (!dateString) return "-";
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     } catch (e) {
       return dateString;
@@ -140,14 +162,14 @@ const HospitalizationHistory = () => {
 
   const calculateDuration = (admissionDate, dischargeDate) => {
     if (!admissionDate || !dischargeDate) return "-";
-    
+
     try {
       const admission = new Date(admissionDate);
       const discharge = new Date(dischargeDate);
-      
+
       const diffTime = Math.abs(discharge - admission);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       return diffDays === 1 ? "1 day" : `${diffDays} days`;
     } catch (e) {
       return "-";
@@ -164,25 +186,29 @@ const HospitalizationHistory = () => {
         <div className="p-6 md:p-10 flex flex-col">
           {/* Page Header */}
           <div className="flex justify-between items-center mb-6">
-            <Typography variant="h4" component="h1" className="text-2xl font-bold">
+            <Typography
+              variant="h4"
+              component="h1"
+              className="text-2xl font-bold"
+            >
               Hospitalization History
             </Typography>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               color="primary"
-              onClick={() => { 
-                setFormData({ 
-                  reason: "", 
-                  admissionDate: "", 
-                  dischargeDate: "", 
-                  hospital: "", 
-                  doctor: "", 
-                  ward: "", 
-                  treatment: "", 
-                  notes: "" 
-                }); 
+              onClick={() => {
+                setFormData({
+                  reason: "",
+                  admissionDate: "",
+                  dischargeDate: "",
+                  hospital: "",
+                  doctor: "",
+                  ward: "",
+                  treatment: "",
+                  notes: "",
+                });
                 setEditingIndex(null);
-                setOpenForm(true); 
+                setOpenForm(true);
               }}
             >
               Add Record
@@ -191,21 +217,21 @@ const HospitalizationHistory = () => {
 
           {/* Error message */}
           {error && (
-            <Paper 
-              sx={{ 
-                mb: 3, 
-                p: 2, 
-                backgroundColor: '#ffebee', 
-                color: '#c62828',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
+            <Paper
+              sx={{
+                mb: 3,
+                p: 2,
+                backgroundColor: "#ffebee",
+                color: "#c62828",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
               <Typography>{error}</Typography>
-              <Button 
-                size="small" 
-                sx={{ ml: 2 }} 
+              <Button
+                size="small"
+                sx={{ ml: 2 }}
                 onClick={() => setError(null)}
               >
                 Dismiss
@@ -222,25 +248,29 @@ const HospitalizationHistory = () => {
             <>
               {/* Empty state */}
               {hospitalizationHistory.length === 0 ? (
-                <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
+                <Paper sx={{ p: 4, textAlign: "center", borderRadius: 2 }}>
                   <Typography variant="h6" color="textSecondary">
                     No hospitalization records found
                   </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ mb: 3 }}
+                  >
                     Get started by adding your first hospitalization record
                   </Typography>
                   <Button
                     variant="contained"
                     onClick={() => {
-                      setFormData({ 
-                        reason: "", 
-                        admissionDate: "", 
-                        dischargeDate: "", 
-                        hospital: "", 
-                        doctor: "", 
-                        ward: "", 
-                        treatment: "", 
-                        notes: "" 
+                      setFormData({
+                        reason: "",
+                        admissionDate: "",
+                        dischargeDate: "",
+                        hospital: "",
+                        doctor: "",
+                        ward: "",
+                        treatment: "",
+                        notes: "",
                       });
                       setOpenForm(true);
                     }}
@@ -250,69 +280,122 @@ const HospitalizationHistory = () => {
                 </Paper>
               ) : (
                 /* Table with records */
-                <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
+                <TableContainer
+                  component={Paper}
+                  sx={{ borderRadius: 2, boxShadow: 3 }}
+                >
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Reason</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Admission Date</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Discharge Date</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Status</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Hospital</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Actions</TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            backgroundColor: "#f5f5f5",
+                          }}
+                        >
+                          Reason
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            backgroundColor: "#f5f5f5",
+                          }}
+                        >
+                          Admission Date
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            backgroundColor: "#f5f5f5",
+                          }}
+                        >
+                          Discharge Date
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            backgroundColor: "#f5f5f5",
+                          }}
+                        >
+                          Status
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            backgroundColor: "#f5f5f5",
+                          }}
+                        >
+                          Hospital
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: "bold",
+                            backgroundColor: "#f5f5f5",
+                          }}
+                        >
+                          Actions
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {hospitalizationHistory.map((record, index) => (
-                        <TableRow 
-                          key={index} 
-                          onClick={() => handleRowClick(record)} 
-                          sx={{ 
-                            cursor: "pointer", 
-                            transition: "background 0.2s", 
+                        <TableRow
+                          key={index}
+                          onClick={() => handleRowClick(record)}
+                          sx={{
+                            cursor: "pointer",
+                            transition: "background 0.2s",
                             "&:hover": { backgroundColor: "#f0f7ff" },
-                            "&:nth-of-type(odd)": { backgroundColor: "#fafafa" }
+                            "&:nth-of-type(odd)": {
+                              backgroundColor: "#fafafa",
+                            },
                           }}
                         >
-                          <TableCell sx={{ fontWeight: 'medium' }}>{record.reason || "-"}</TableCell>
-                          <TableCell>{formatDate(record.admissionDate)}</TableCell>
-                          <TableCell>{formatDate(record.dischargeDate)}</TableCell>
+                          <TableCell sx={{ fontWeight: "medium" }}>
+                            {record.reason || "-"}
+                          </TableCell>
                           <TableCell>
-                            <Chip 
-                              label={getStatus(record)} 
+                            {formatDate(record.admissionDate)}
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(record.dischargeDate)}
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={getStatus(record)}
                               color={getStatusChipColor(record)}
                               size="small"
                             />
                           </TableCell>
                           <TableCell>{record.hospital || "-"}</TableCell>
                           <TableCell>
-                            <Button 
+                            <Button
                               size="small"
-                              onClick={(e) => { 
-                                e.stopPropagation(); 
-                                handleRowClick(record); 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRowClick(record);
                               }}
                               sx={{ mr: 1 }}
                             >
                               View
                             </Button>
-                            <Button 
-                              color="primary" 
+                            <Button
+                              color="primary"
                               size="small"
-                              onClick={(e) => { 
-                                e.stopPropagation(); 
-                                editRecord(index); 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                editRecord(index);
                               }}
                               sx={{ mr: 1 }}
                             >
                               Edit
                             </Button>
-                            <Button 
-                              color="error" 
+                            <Button
+                              color="error"
                               size="small"
-                              onClick={(e) => { 
-                                e.stopPropagation(); 
-                                deleteRecord(index); 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteRecord(index);
                               }}
                             >
                               Delete
@@ -331,123 +414,136 @@ const HospitalizationHistory = () => {
 
       {/* Form Modal */}
       <Modal open={openForm} onClose={() => setOpenForm(false)}>
-        <Box sx={{ 
-          position: "absolute", 
-          top: "50%", 
-          left: "50%", 
-          transform: "translate(-50%, -50%)", 
-          width: { xs: "90%", sm: 500 }, 
-          maxWidth: 500,
-          bgcolor: "white", 
-          p: 4, 
-          borderRadius: "10px",
-          boxShadow: 24
-        }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: { xs: "90%", sm: 500 },
+            maxWidth: 500,
+            bgcolor: "white",
+            p: 4,
+            borderRadius: "10px",
+            boxShadow: 24,
+          }}
+        >
           <SimpleBar style={{ maxHeight: "80vh" }}>
             <Typography variant="h5" component="h2" sx={{ mb: 3 }}>
               {editingIndex !== null ? "Edit" : "Add"} Hospitalization Record
             </Typography>
-            
-            <TextField 
-              fullWidth 
-              margin="normal" 
-              label="Reason for Hospitalization" 
-              name="reason" 
-              value={formData.reason} 
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Reason for Hospitalization"
+              name="reason"
+              value={formData.reason}
               onChange={handleFormChange}
               required
               error={openForm && !formData.reason}
-              helperText={openForm && !formData.reason ? "This field is required" : ""}
+              helperText={
+                openForm && !formData.reason ? "This field is required" : ""
+              }
             />
-            
-            <TextField 
-              fullWidth 
-              margin="normal" 
+
+            <TextField
+              fullWidth
+              margin="normal"
               label="Admission Date"
               InputLabelProps={{ shrink: true }}
-              type="date" 
-              name="admissionDate" 
-              value={formData.admissionDate} 
+              type="date"
+              name="admissionDate"
+              value={formData.admissionDate}
               onChange={handleFormChange}
               required
               error={openForm && !formData.admissionDate}
-              helperText={openForm && !formData.admissionDate ? "This field is required" : ""}
+              helperText={
+                openForm && !formData.admissionDate
+                  ? "This field is required"
+                  : ""
+              }
             />
-            
-            <TextField 
-              fullWidth 
-              margin="normal" 
+
+            <TextField
+              fullWidth
+              margin="normal"
               label="Discharge Date"
               InputLabelProps={{ shrink: true }}
-              type="date" 
-              name="dischargeDate" 
-              value={formData.dischargeDate} 
+              type="date"
+              name="dischargeDate"
+              value={formData.dischargeDate}
               onChange={handleFormChange}
             />
-            
-            <TextField 
-              fullWidth 
-              margin="normal" 
-              label="Hospital/Medical Center" 
-              name="hospital" 
-              value={formData.hospital} 
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Hospital/Medical Center"
+              name="hospital"
+              value={formData.hospital}
               onChange={handleFormChange}
               required
               error={openForm && !formData.hospital}
-              helperText={openForm && !formData.hospital ? "This field is required" : ""} 
+              helperText={
+                openForm && !formData.hospital ? "This field is required" : ""
+              }
             />
-            
-            <TextField 
-              fullWidth 
-              margin="normal" 
-              label="Attending Doctor" 
-              name="doctor" 
-              value={formData.doctor} 
-              onChange={handleFormChange} 
-            />
-            
-            <TextField 
-              fullWidth 
-              margin="normal" 
-              label="Ward/Room" 
-              name="ward" 
-              value={formData.ward} 
-              onChange={handleFormChange} 
-            />
-            
-            <TextField 
-              fullWidth 
-              margin="normal" 
-              label="Treatment/Procedures" 
-              name="treatment" 
-              value={formData.treatment} 
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Attending Doctor"
+              name="doctor"
+              value={formData.doctor}
               onChange={handleFormChange}
-              multiline 
+            />
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Ward/Room"
+              name="ward"
+              value={formData.ward}
+              onChange={handleFormChange}
+            />
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Treatment/Procedures"
+              name="treatment"
+              value={formData.treatment}
+              onChange={handleFormChange}
+              multiline
               rows={2}
             />
-            
-            <TextField 
-              fullWidth 
-              margin="normal" 
-              label="Notes" 
-              name="notes" 
-              value={formData.notes} 
-              onChange={handleFormChange} 
-              multiline 
-              rows={3} 
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Notes"
+              name="notes"
+              value={formData.notes}
+              onChange={handleFormChange}
+              multiline
+              rows={3}
             />
-            
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
-              <Button 
-                variant="outlined" 
-                onClick={() => setOpenForm(false)}
-              >
+
+            <Box
+              sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}
+            >
+              <Button variant="outlined" onClick={() => setOpenForm(false)}>
                 Cancel
               </Button>
-              <Button 
-                variant="contained" 
+              <Button
+                variant="contained"
                 onClick={submit}
-                disabled={!formData.reason || !formData.admissionDate || !formData.hospital}
+                disabled={
+                  !formData.reason ||
+                  !formData.admissionDate ||
+                  !formData.hospital
+                }
               >
                 Save
               </Button>
@@ -458,114 +554,145 @@ const HospitalizationHistory = () => {
 
       {/* Details Modal */}
       <Modal open={!!selectedRecord} onClose={() => setSelectedRecord(null)}>
-        <Box sx={{ 
-          position: "absolute", 
-          top: "50%", 
-          left: "50%", 
-          transform: "translate(-50%, -50%)", 
-          width: { xs: "90%", sm: 450 }, 
-          maxWidth: 450,
-          bgcolor: "white", 
-          p: 4, 
-          borderRadius: "10px", 
-          boxShadow: 24 
-        }}>
-        <SimpleBar style={{ maxHeight: "80vh" }}>
-          {selectedRecord && (
-            <>
-              <Typography variant="h5" sx={{ mb: 3, fontWeight: "bold" }}>
-                Hospitalization Details
-              </Typography>
-              
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" color="primary">
-                  {selectedRecord.reason || "Unnamed Hospital Stay"}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: { xs: "90%", sm: 450 },
+            maxWidth: 450,
+            bgcolor: "white",
+            p: 4,
+            borderRadius: "10px",
+            boxShadow: 24,
+          }}
+        >
+          <SimpleBar style={{ maxHeight: "80vh" }}>
+            {selectedRecord && (
+              <>
+                <Typography variant="h5" sx={{ mb: 3, fontWeight: "bold" }}>
+                  Hospitalization Details
                 </Typography>
-                <Chip 
-                  label={getStatus(selectedRecord)} 
-                  color={getStatusChipColor(selectedRecord)}
-                  size="small"
-                  sx={{ mt: 1 }}
-                />
-              </Box>
-              
-              <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-                <Typography variant="body2" color="textSecondary">Hospital Stay</Typography>
-                <Typography variant="body1">
-                  {formatDate(selectedRecord.admissionDate) || "Not specified"} 
-                  {selectedRecord.dischargeDate ? ` to ${formatDate(selectedRecord.dischargeDate)}` : " (still admitted)"}
-                </Typography>
-                {selectedRecord.admissionDate && selectedRecord.dischargeDate && (
-                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                    Duration: {calculateDuration(selectedRecord.admissionDate, selectedRecord.dischargeDate)}
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="h6" color="primary">
+                    {selectedRecord.reason || "Unnamed Hospital Stay"}
                   </Typography>
-                )}
-              </Paper>
-              
-              <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-                <Typography variant="body2" color="textSecondary">Facility Information</Typography>
-                <Typography variant="body1">
-                  {selectedRecord.hospital || "Not specified"}
-                </Typography>
-                {selectedRecord.ward && (
-                  <Typography variant="body1" color="textSecondary">
-                    Ward/Room: {selectedRecord.ward}
-                  </Typography>
-                )}
-                {selectedRecord.doctor && (
-                  <Typography variant="body1" color="textSecondary">
-                    Attending Doctor: Dr. {selectedRecord.doctor}
-                  </Typography>
-                )}
-              </Paper>
-              
-              {selectedRecord.treatment && (
+                  <Chip
+                    label={getStatus(selectedRecord)}
+                    color={getStatusChipColor(selectedRecord)}
+                    size="small"
+                    sx={{ mt: 1 }}
+                  />
+                </Box>
+
                 <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-                  <Typography variant="body2" color="textSecondary">Treatment/Procedures</Typography>
-                  <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                    {selectedRecord.treatment}
+                  <Typography variant="body2" color="textSecondary">
+                    Hospital Stay
                   </Typography>
+                  <Typography variant="body1">
+                    {formatDate(selectedRecord.admissionDate) ||
+                      "Not specified"}
+                    {selectedRecord.dischargeDate
+                      ? ` to ${formatDate(selectedRecord.dischargeDate)}`
+                      : " (still admitted)"}
+                  </Typography>
+                  {selectedRecord.admissionDate &&
+                    selectedRecord.dischargeDate && (
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        sx={{ mt: 1 }}
+                      >
+                        Duration:{" "}
+                        {calculateDuration(
+                          selectedRecord.admissionDate,
+                          selectedRecord.dischargeDate,
+                        )}
+                      </Typography>
+                    )}
                 </Paper>
-              )}
-              
-              {selectedRecord.notes && (
+
                 <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-                  <Typography variant="body2" color="textSecondary">Notes</Typography>
-                  <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                    {selectedRecord.notes}
+                  <Typography variant="body2" color="textSecondary">
+                    Facility Information
                   </Typography>
+                  <Typography variant="body1">
+                    {selectedRecord.hospital || "Not specified"}
+                  </Typography>
+                  {selectedRecord.ward && (
+                    <Typography variant="body1" color="textSecondary">
+                      Ward/Room: {selectedRecord.ward}
+                    </Typography>
+                  )}
+                  {selectedRecord.doctor && (
+                    <Typography variant="body1" color="textSecondary">
+                      Attending Doctor: Dr. {selectedRecord.doctor}
+                    </Typography>
+                  )}
                 </Paper>
-              )}
-              
-              <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
-                <Button 
-                  variant="outlined" 
-                  onClick={() => setSelectedRecord(null)}
+
+                {selectedRecord.treatment && (
+                  <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Treatment/Procedures
+                    </Typography>
+                    <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+                      {selectedRecord.treatment}
+                    </Typography>
+                  </Paper>
+                )}
+
+                {selectedRecord.notes && (
+                  <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Notes
+                    </Typography>
+                    <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+                      {selectedRecord.notes}
+                    </Typography>
+                  </Paper>
+                )}
+
+                <Box
+                  sx={{
+                    mt: 3,
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  Close
-                </Button>
-                {selectedRecord && hospitalizationHistory.findIndex(r => 
-                  r.reason === selectedRecord.reason && 
-                  r.admissionDate === selectedRecord.admissionDate
-                ) !== -1 && (
-                  <Button 
-                    variant="contained" 
-                    onClick={() => {
-                      const index = hospitalizationHistory.findIndex(r => 
-                        r.reason === selectedRecord.reason && 
-                        r.admissionDate === selectedRecord.admissionDate
-                      );
-                      editRecord(index);
-                      setSelectedRecord(null);
-                    }}
+                  <Button
+                    variant="outlined"
+                    onClick={() => setSelectedRecord(null)}
                   >
-                    Edit
+                    Close
                   </Button>
-                )}
-              </Box>
-            </>
-          )}
-        </SimpleBar>
+                  {selectedRecord &&
+                    hospitalizationHistory.findIndex(
+                      (r) =>
+                        r.reason === selectedRecord.reason &&
+                        r.admissionDate === selectedRecord.admissionDate,
+                    ) !== -1 && (
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          const index = hospitalizationHistory.findIndex(
+                            (r) =>
+                              r.reason === selectedRecord.reason &&
+                              r.admissionDate === selectedRecord.admissionDate,
+                          );
+                          editRecord(index);
+                          setSelectedRecord(null);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                </Box>
+              </>
+            )}
+          </SimpleBar>
         </Box>
       </Modal>
     </div>

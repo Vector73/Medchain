@@ -6914,9 +6914,7 @@
   "ast": {
     "absolutePath": "project:/contracts/Cruds.sol",
     "exportedSymbols": {
-      "Cruds": [
-        166
-      ]
+      "Cruds": [166]
     },
     "id": 167,
     "license": "MIT",
@@ -6924,12 +6922,7 @@
     "nodes": [
       {
         "id": 1,
-        "literals": [
-          "solidity",
-          "^",
-          "0.8",
-          ".19"
-        ],
+        "literals": ["solidity", "^", "0.8", ".19"],
         "nodeType": "PragmaDirective",
         "src": "33:24:0"
       },
@@ -6941,9 +6934,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 166,
-        "linearizedBaseContracts": [
-          166
-        ],
+        "linearizedBaseContracts": [166],
         "name": "Cruds",
         "nameLocation": "70:5:0",
         "nodeType": "ContractDefinition",
@@ -7129,9 +7120,7 @@
               "src": "301:505:0",
               "statements": [
                 {
-                  "assignments": [
-                    21
-                  ],
+                  "assignments": [21],
                   "declarations": [
                     {
                       "constant": false,
@@ -7394,9 +7383,7 @@
                   },
                   "id": 49,
                   "initializationExpression": {
-                    "assignments": [
-                      25
-                    ],
+                    "assignments": [25],
                     "declarations": [
                       {
                         "constant": false,
@@ -7750,9 +7737,7 @@
               "src": "861:512:0",
               "statements": [
                 {
-                  "assignments": [
-                    75
-                  ],
+                  "assignments": [75],
                   "declarations": [
                     {
                       "constant": false,
@@ -8015,9 +8000,7 @@
                   },
                   "id": 103,
                   "initializationExpression": {
-                    "assignments": [
-                      79
-                    ],
+                    "assignments": [79],
                     "declarations": [
                       {
                         "constant": false,

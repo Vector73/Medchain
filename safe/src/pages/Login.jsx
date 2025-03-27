@@ -43,9 +43,13 @@ const Auth = () => {
       const myContract = new web3.eth.Contract(contract.abi, contract.address);
 
       // Get the latest CID directly from blockchain mappings
-      const patientCIDs = await myContract.methods.getPatient(walletAddress).call();
+      const patientCIDs = await myContract.methods
+        .getPatient(walletAddress)
+        .call();
       console.log("Patient CIDs:", patientCIDs);
-      const doctorCIDs = await myContract.methods.getDoctor(walletAddress).call();
+      const doctorCIDs = await myContract.methods
+        .getDoctor(walletAddress)
+        .call();
 
       console.log("Doctor CIDs:", doctorCIDs);
 
@@ -60,8 +64,8 @@ const Auth = () => {
       else if (patientCIDs) {
         userHash = patientCIDs; // Latest patient record
         userType = "patient";
-      } 
-      
+      }
+
       // Check for the latest doctor CID if not found in patients
 
       if (!userHash) {
@@ -75,7 +79,9 @@ const Auth = () => {
 
       // Navigate based on user role
       setUserType(userType);
-      navigate(userType === "patient" ? "/patient-dashboard" : "/doctor-dashboard");
+      navigate(
+        userType === "patient" ? "/patient-dashboard" : "/doctor-dashboard",
+      );
     } catch (error) {
       console.error("Error fetching user data:", error);
       setError("Error fetching user data. Please try again.");
@@ -89,11 +95,14 @@ const Auth = () => {
         {loading ? (
           <p className="text-lg font-medium text-gray-600">Connecting...</p>
         ) : account ? (
-          <p className="text-lg font-medium">Connected as: <span className="text-blue-600">{account}</span></p>
+          <p className="text-lg font-medium">
+            Connected as: <span className="text-blue-600">{account}</span>
+          </p>
         ) : (
-          <button 
-            onClick={connectWallet} 
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition duration-300">
+          <button
+            onClick={connectWallet}
+            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition duration-300"
+          >
             Connect Wallet
           </button>
         )}

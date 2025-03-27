@@ -52,7 +52,7 @@ const Doctors = () => {
           });
           const contractInstance = new web3Instance.eth.Contract(
             contract["abi"],
-            contract["address"]
+            contract["address"],
           );
 
           setWeb3(web3Instance);
@@ -95,7 +95,7 @@ const Doctors = () => {
           } catch (addressError) {
             console.error(
               `Error fetching doctor data for address ${address}:`,
-              addressError
+              addressError,
             );
           }
         }
@@ -127,7 +127,7 @@ const Doctors = () => {
     const filtered = doctors.filter(
       (doctor) =>
         doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (specialityFilter === "" || doctor.speciality === specialityFilter)
+        (specialityFilter === "" || doctor.speciality === specialityFilter),
     );
     setFilteredDoctors(filtered);
   }, [searchTerm, specialityFilter, doctors]);
@@ -178,7 +178,9 @@ const Doctors = () => {
         return;
       }
 
-      patientData.selectedDoctors = patientData.selectedDoctors.filter((address) => address !== doctor.address)
+      patientData.selectedDoctors = patientData.selectedDoctors.filter(
+        (address) => address !== doctor.address,
+      );
       const client = create(new URL("http://127.0.0.1:5001"));
       const { cid } = await client.add(JSON.stringify(patientData));
       const newHash = cid.toString();
@@ -324,7 +326,7 @@ const Doctors = () => {
                               : "Available"
                           }
                           color={getStatusChipColor(
-                            selectedDoctors.has(doctor.address)
+                            selectedDoctors.has(doctor.address),
                           )}
                           size="small"
                         />
@@ -407,7 +409,7 @@ const Doctors = () => {
                         : "Available"
                     }
                     color={getStatusChipColor(
-                      selectedDoctors.has(selectedDoctor.address)
+                      selectedDoctors.has(selectedDoctor.address),
                     )}
                     size="small"
                   />

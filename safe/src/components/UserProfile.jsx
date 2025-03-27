@@ -1,15 +1,24 @@
-import React from 'react';
-import { useCookies } from 'react-cookie';
-import { LogOut } from 'lucide-react';
+import React from "react";
+import { useCookies } from "react-cookie";
+import { LogOut } from "lucide-react";
 
 const UserProfile = () => {
   const [, , removeCookie] = useCookies();
 
   function logout() {
     // Remove all relevant cookies
-    ['temporary', 'name', 'mail', 'index', 'password', 
-     'patients', 'doctors', 'insurance', 'type', 'allergies']
-    .forEach(cookie => removeCookie(cookie));
+    [
+      "temporary",
+      "name",
+      "mail",
+      "index",
+      "password",
+      "patients",
+      "doctors",
+      "insurance",
+      "type",
+      "allergies",
+    ].forEach((cookie) => removeCookie(cookie));
 
     // Redirect to login page
     window.location.href = "/";
@@ -17,8 +26,8 @@ const UserProfile = () => {
 
   return (
     <div className="absolute right-4 top-16 w-72 bg-white dark:bg-[#42464D] shadow-lg rounded-lg p-4">
-      <button 
-        onClick={logout} 
+      <button
+        onClick={logout}
         className="w-full flex items-center justify-center space-x-2 
                    bg-red-500 hover:bg-red-600 text-white 
                    py-2 px-4 rounded-md transition-colors duration-300 

@@ -1,25 +1,24 @@
-import React from 'react';
-import { BsCurrencyDollar } from 'react-icons/bs';
-import { CgProfile } from 'react-icons/cg';
-import { MdOutlineMedicalServices } from 'react-icons/md';
-
+import React from "react";
+import { BsCurrencyDollar } from "react-icons/bs";
+import { CgProfile } from "react-icons/cg";
+import { MdOutlineMedicalServices } from "react-icons/md";
 
 export const links = [
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     links: [
       {
-        name: 'doctor-dashboard',
-        title: 'My Profile',
+        name: "doctor-dashboard",
+        title: "My Profile",
         icon: <CgProfile />,
       },
     ],
   },
   {
-    title: 'My Patients',
+    title: "My Patients",
     links: [
       {
-        name: 'patients',
+        name: "patients",
         icon: <MdOutlineMedicalServices />,
       },
     ],
@@ -28,37 +27,37 @@ export const links = [
 
 export const themeColors = [
   {
-    name: 'blue-theme',
-    color: '#1A97F5',
+    name: "blue-theme",
+    color: "#1A97F5",
   },
   {
-    name: 'green-theme',
-    color: '#03C9D7',
+    name: "green-theme",
+    color: "#03C9D7",
   },
   {
-    name: 'purple-theme',
-    color: '#7352FF',
+    name: "purple-theme",
+    color: "#7352FF",
   },
   {
-    name: 'red-theme',
-    color: '#FF5C8E',
+    name: "red-theme",
+    color: "#FF5C8E",
   },
   {
-    name: 'indigo-theme',
-    color: '#1E4DB7',
+    name: "indigo-theme",
+    color: "#1E4DB7",
   },
   {
-    color: '#FB9678',
-    name: 'orange-theme',
+    color: "#FB9678",
+    name: "orange-theme",
   },
 ];
 
 export const userProfileData = [
   {
     icon: <BsCurrencyDollar />,
-    title: 'My Profile',
-    desc: 'Account Settings',
-    iconColor: '#03C9D7',
-    iconBg: '#E5FAFB',
+    title: "My Profile",
+    desc: "Account Settings",
+    iconColor: "#03C9D7",
+    iconBg: "#E5FAFB",
   },
 ];
