@@ -1,11 +1,11 @@
 {
-  "address": "0xE4c47129FcceAd2fA90C45dE3fBc2507f51A9B92",
+  "address": "0xE1509BCa7f7b8e62d61c9b15B495c7b705c10707",
   "abi": [
     {
       "inputs": [
         {
           "internalType": "string",
-          "name": "doc_cid",
+          "name": "_cid",
           "type": "string"
         }
       ],
@@ -15,24 +15,10 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "getDoctor",
-      "outputs": [
-        {
-          "internalType": "string[]",
-          "name": "",
-          "type": "string[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
       "inputs": [
         {
           "internalType": "string",
-          "name": "patient_cid",
+          "name": "_cid",
           "type": "string"
         }
       ],
@@ -42,13 +28,67 @@
       "type": "function"
     },
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "doctorAddress",
+          "type": "address"
+        }
+      ],
+      "name": "getDoctor",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "patientAddress",
+          "type": "address"
+        }
+      ],
       "name": "getPatient",
       "outputs": [
         {
-          "internalType": "string[]",
+          "internalType": "string",
           "name": "",
-          "type": "string[]"
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "getPatients",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "getDoctors",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
         }
       ],
       "stateMutability": "view",

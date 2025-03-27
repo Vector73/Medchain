@@ -1,6 +1,6 @@
 export { default as Home } from './Home';
 export { default as MyProfile } from './MyProfile';
-export { default as MyProfileDoc } from './MyProfileDoc';
+export { default as MyProfileDoctor } from './MyProfileDoctor';
 export { default as Doctors } from './Doctors';
 export { default as Patients } from './Patients';
 export { default as Insurance } from './Insurance';

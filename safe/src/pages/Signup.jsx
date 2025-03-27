@@ -1,165 +1,101 @@
-/* eslint-disable */
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
-import './Signup.css'
 import Web3 from "web3";
-import contract from '../contracts/contract.json';
-import { create } from 'ipfs-http-client'
+import contract from "../contracts/contract.json";
+import { useNavigate } from "react-router-dom";
+import { create } from "ipfs-http-client";
 
-const Signup = () => {
-    const [type, setType] = useState(false);
-    const [regp, setRegp] = useState({
-        "name": "",
-        "mail": "",
-        "password": "",
-        "insurance": [{}],
-        "allergies": [{}],
-        "medicalhistory": [{}],
-        "hospitalizationhistory": [{}],
-        "visit": [{}],
-        "selectedDoctors": [{}]
-    });
+const Register = () => {
+  const [userType, setUserType] = useState("patient");
+  const [formData, setFormData] = useState({ name: "", mail: "", wallet: "", password: "", license: "", speciality: "" });
+  const navigate = useNavigate();
 
-    const [regd, setRegd] = useState({
-        "name": "",
-        "mail": "",
-        "password": "",
-        license: "",
-        speciality: ""
-    });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    function handle(e) {
-        const newData1 = { ...regp };
-        const newData2 = { ...regd };
-        newData1[e.target.name] = e.target.value;
-        newData2[e.target.name] = e.target.value;
-        setRegp(newData1);
-        setRegd(newData2);
+  const registerUser = async () => {
+    if (!window.ethereum) {
+      alert("MetaMask not detected");
+      return;
     }
-
-    function handleD(e) {
-        const newData = { ...regd };
-        newData[e.target.name] = e.target.value;
-        setRegd(newData);
+  
+    const web3 = new Web3(window.ethereum);
+    const accounts = await web3.eth.requestAccounts();
+    formData.wallet = accounts[0];
+    console.log(accounts)
+  
+    const myContract = new web3.eth.Contract(contract.abi, contract.address);
+  
+    try {
+      let userHash = null;
+      
+      try {
+        // Check if user already exists
+        userHash = await myContract.methods.getPatient(accounts[0]).call();
+        console.log(userHash)
+      } catch (error) {
+        console.warn("User not found, creating a new record...");
+      }
+  
+      if (userHash) {
+        alert("User already registered!");
+        return;
+      }
+      console.log(userHash)
+  
+      const client = create(new URL("http://127.0.0.1:5001"));
+  
+      // Default profile if new user
+      const defaultProfile = {
+        name: formData.name,
+        mail: formData.mail,
+        wallet: formData.wallet,
+        password: formData.password,
+        ...(userType === "doctor" && { speciality: formData.speciality, license: formData.license }),
+      };
+  
+      // Upload default profile to IPFS
+      const { cid } = await client.add(JSON.stringify(defaultProfile));
+      const hash = cid.toString();
+  
+      console.log("New User CID:", hash);
+  
+      // Store hash on blockchain
+      const method = userType === "doctor" ? myContract.methods.addDoctor : myContract.methods.addPatient;
+      await method(hash).send({ from: accounts[0] });
+  
+      alert("Registration successful!");
+      navigate("/");
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("Registration failed: " + error.message);
     }
+  };
+  
 
-    async function register(e) {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const currentaddress = accounts[0];
+  return (
+    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-green-500 to-blue-500 text-white p-6">
+      <div className="bg-white text-gray-900 shadow-lg rounded-lg p-8 max-w-md w-full text-center">
+        <h2 className="text-2xl font-semibold mb-4">Register</h2>
+        <select onChange={(e) => setUserType(e.target.value)} className="mb-4 p-2 border rounded">
+          <option value="patient">Patient</option>
+          <option value="doctor">Doctor</option>
+        </select>
+        <input name="name" placeholder="Full Name" onChange={handleChange} className="block w-full p-2 mb-2 border rounded" />
+        <input name="mail" type="email" placeholder="Email" onChange={handleChange} className="block w-full p-2 mb-2 border rounded" />
+        <input name="password" type="password" placeholder="Password" onChange={handleChange} className="block w-full p-2 mb-2 border rounded" />
+        {userType === "doctor" && (
+          <>
+            <input name="speciality" placeholder="Speciality" onChange={handleChange} className="block w-full p-2 mb-2 border rounded" />
+            <input name="license" placeholder="License Number" onChange={handleChange} className="block w-full p-2 mb-2 border rounded" />
+          </>
+        )}
+        <button onClick={registerUser} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition duration-300">
+          Register
+        </button>
+      </div>
+    </div>
+  );
+};
 
-        const web3 = new Web3(window.ethereum);
-        const mycontract = new web3.eth.Contract(
-            contract["abi"],
-            contract["address"]
-        );
-
-        if (!e) {
-            // patient
-            let client = create();
-            client = create(new URL('http://127.0.0.1:5001'));
-            const { cid } = await client.add(JSON.stringify(regp));
-            const hash = cid['_baseCache'].get('z');
-            console.log(hash);
-
-            await mycontract.methods.addPatient(hash).send({ from: currentaddress }).then(() => {
-                alert("Account created");
-            }).catch((err) => {
-                console.log(err);
-            })
-        }
-        else {
-            // doctor
-            let client = create();
-            client = create(new URL('http://127.0.0.1:5001'))
-            const { cid } = await client.add(JSON.stringify(regd));
-            const hash = cid['_baseCache'].get('z');
-            console.log(hash);
-
-            await mycontract.methods.addDoctor(hash).send({ from: currentaddress }).then(() => {
-                alert("Account created");
-            }).catch((err) => {
-                console.log(err);
-            })
-        }
-    }
-
-    return (
-
-        <div className="login-container bg-gradient-to-r from-cyan-500 to-blue-500 via-teal-200 ">
-            <form className="login-form backdrop-blur-lg
-               [ p-8 md:p-10 lg:p-10 ]
-               [ bg-gradient-to-b from-white/60 to-white/30 ]
-               [ border-[1px] border-solid border-white border-opacity-30 ]
-               [ shadow-black/70 shadow-2xl ]">
-                <h2 className="login-form-title">Sign Up</h2>
-                <div className="input-container">
-                    <div className="input-div">
-                        <div className="input-heading">
-                            <i className="fas fa-user"></i>
-                            <h5>Username</h5>
-                        </div>
-                        <input name="name" onChange={(e) => handle(e)} id="name" placeholder="Full Name" />
-                    </div>
-                    <div className="input-div">
-                        <div className="input-heading" style={{ margin: "1rem 0", }}>
-                            <i className="fas fa-key"></i>
-                            <h5>User Type</h5>
-                            <select id="user-type" name="type" onChange={() => { setType(!type) }} style={{padding:'0.5rem', backgroundColor:'white'}}>
-                                <option value="patient">Patient</option>
-                                <option value="doctor">Doctor</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="input-div">
-                        <div className="input-heading">
-                            <i className="fas fa-envelope"></i>
-                            <h5>Email</h5>
-                        </div>
-                        <input onChange={(e) => handle(e)} type="mail" placeholder="youremail@gmail.com" id="email" name="mail" />
-
-
-                    </div>
-
-                    {type &&
-                        <div className="input-div" style={{ display: 'flex', gap: '1rem' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <div className="input-heading">
-                                    <i className="fas fa-suitcase"></i>
-                                    <p>Specialization</p>
-                                </div>
-                                <input onChange={(e) => handleD(e)} type="text" placeholder="Specialization" id="email" name="speciality" />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <div className="input-heading">
-                                    <i className="fas fa-key"></i>
-                                    <p>License No.</p>
-                                </div>
-                                <input onChange={(e) => handleD(e)} type="text" placeholder="License No." id="email" name="license" />
-                            </div>
-                        </div>
-                    }
-
-                    <div className="input-div">
-                        <div className="input-heading">
-                            <i className="fas fa-lock"></i>
-                            <h5>Password</h5>
-                        </div>
-                        <input onChange={(e) => handle(e)} type="password" placeholder="********" id="password" name="password" />
-
-                    </div>
-
-                </div>
-
-                <input type="button" value="Sign Up" className="btn" onClick={() => { register(type) }} />
-                <p style={{ textAlign: "right" }}>Already a user?
-                    <Link style={{ marginLeft: "4px", color: "black", textDecoration: "underline" }} to='/login'>Log In.</Link>
-                </p>
-
-            </form >
-        </div >
-
-    )
-}
-
-export default Signup;
+export default Register;

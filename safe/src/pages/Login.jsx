@@ -1,221 +1,106 @@
-/* eslint-disable */
 import React, { useEffect, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
 import Web3 from "web3";
 import contract from "../contracts/contract.json";
+import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import "./Login.css";
 
-const Login = () => {
-    const [type, setType] = useState(false);
-    const [doctors, setDoc] = useState([]);
-    const [patients, setPatient] = useState([]);
-    const [cookies, setCookie] = useCookies([]);
+const Auth = () => {
+  const [account, setAccount] = useState(null);
+  const [userType, setUserType] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [cookies, setCookie] = useCookies(["hash"]);
+  const navigate = useNavigate();
 
-    const [log, setLog] = useState({
-        mail: "",
-        password: ""
-    });
+  useEffect(() => {
+    connectWallet();
+  }, []);
 
-    const web3 = new Web3(window.ethereum);
-    const mycontract = new web3.eth.Contract(
-        contract["abi"],
-        contract["address"]
-    );
-
-    function handle(e) {
-        const newData = { ...log };
-        newData[e.target.name] = e.target.value;
-        setLog(newData);
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      setError("MetaMask not detected. Please install MetaMask.");
+      return;
     }
 
-    async function loadDoctors() {
-        var accounts = await window.ethereum.request({
-            method: "eth_requestAccounts",
-        });
-        var currentaddress = accounts[0];
+    try {
+      setLoading(true);
+      const web3 = new Web3(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      const accounts = await web3.eth.getAccounts();
+      setAccount(accounts[0]);
 
-        const web3 = new Web3(window.ethereum);
-        const mycontract = new web3.eth.Contract(
-            contract["abi"],
-            contract["address"]
-        );
-
-        mycontract.methods
-            .getdata()
-            .call()
-            .then(res => {
-                res.map(data => {
-                    data = JSON.parse(data);
-                    if (data['type'] === 'doctor') {
-                        doctors.push(data);
-                    }
-                })
-                setCookie('doctors', doctors);
-            })
+      // Fetch user type and CID from blockchain
+      await fetchUserData(web3, accounts[0]);
+    } catch (error) {
+      setError("MetaMask connection failed");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    function resetCook(val, data) {
-        var list = [];
-        for (let j = 1; j < data.length; j++) {
-            list.push(data[j]);
-        }
-        setCookie(val, list);
+  const fetchUserData = async (web3, walletAddress) => {
+    try {
+      const myContract = new web3.eth.Contract(contract.abi, contract.address);
+
+      // Get the latest CID directly from blockchain mappings
+      const patientCIDs = await myContract.methods.getPatient(walletAddress).call();
+      console.log("Patient CIDs:", patientCIDs);
+      const doctorCIDs = await myContract.methods.getDoctor(walletAddress).call();
+
+      console.log("Doctor CIDs:", doctorCIDs);
+
+      let userHash = null;
+      let userType = null;
+
+      if (doctorCIDs) {
+        userHash = doctorCIDs; // Latest doctor record
+        userType = "doctor";
+      }
+      // Check for the latest patient CID
+      else if (patientCIDs) {
+        userHash = patientCIDs; // Latest patient record
+        userType = "patient";
+      } 
+      
+      // Check for the latest doctor CID if not found in patients
+
+      if (!userHash) {
+        setError("User not found. Please register first.");
+        return;
+      }
+
+      // Save the latest CID in cookies
+      setCookie("hash", userHash, { path: "/" });
+      setCookie("userType", userType);
+
+      // Navigate based on user role
+      setUserType(userType);
+      navigate(userType === "patient" ? "/patient-dashboard" : "/doctor-dashboard");
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setError("Error fetching user data. Please try again.");
     }
+  };
 
-    async function login(e) {
-        var accounts = await window.ethereum.request({
-            method: "eth_requestAccounts",
-        });
-        var currentaddress = accounts[0];
-
-        if (!e) {
-            // patient
-            var pats = [];
-            const vis = [];
-            await mycontract.methods
-                .getPatient()
-                .call()
-                .then(async (res) => {
-                    for (let i = res.length - 1; i >= 0; i--) {
-                        const data = await (await fetch(`http://localhost:8080/ipfs/${res[i]}`)).json();
-                        if (!vis.includes(data.mail)) {
-                            vis.push(data.mail);
-                            pats.push(res[i]);
-                        }
-                    }
-                });
-
-            let flag = 0;
-            pats.map(async (data) => {
-                await fetch(`http://localhost:8080/ipfs/${data}`)
-                    .then(res => res.json())
-                    .then(res => {
-                        if (res.mail === log.mail) {
-                            if (res.password === log.password) {
-                                console.log(data);
-                                setCookie('hash', data);
-                                setCookie('type', 'patient');
-                                alert("Logged in");
-                                window.location.href = "/myprofile";
-                            }
-                            else {
-                                alert("Wrong Password");
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
-            })
-        }
-        else {
-            // doctor
-            var docs = [];
-            await mycontract.methods
-                .getDoctor()
-                .call()
-                .then(res => {
-                    res.map(d => {
-                        docs.push(d);
-                    })
-                });
-
-            let flag = 0;
-            docs.map(data => {
-                fetch(`http://localhost:8080/ipfs/${data}`)
-                    .then(res => res.json())
-                    .then(res => {
-                        if (res.mail === log.mail) {
-                            if (res.password === log.password) {
-                                setCookie('hash', data);
-                                setCookie('type', 'doctor');
-                                alert("Logged in");
-                                window.location.href = "/myprofiledoc";
-                            }
-                            else {
-                                alert("Wrong Password");
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
-            })
-        }
-    }
-
-    async function show() {
-        mycontract.methods
-            .getdata()
-            .call()
-            .then(res => {
-                res.map(d => {
-                    console.log(JSON.parse(d));
-                })
-            })
-    }
-
-    return (
-        <div className="login-container bg-gradient-to-r from-cyan-500 to-blue-500 via-teal-200 ">
-            <form className="login-form backdrop-blur-lg
-               [ p-8 md:p-10 lg:p-10 ]
-               [ bg-gradient-to-b from-white/60 to-white/30 ]
-               [ border-[1px] border-solid border-white border-opacity-30 ]
-               [ shadow-black/70 shadow-2xl ]">
-                <h2 className="login-form-title">Log In</h2>
-                <div className="input-container">
-                    <div className="input-div">
-                        <div className="input-heading">
-                            <i className="fas fa-user"></i>
-                            <h5>Email</h5>
-                        </div>
-                        <input
-                            onChange={(e) => handle(e)}
-                            type="email"
-                            placeholder="youremail@gmail.com"
-                            id="email"
-                            name="mail"
-                        />
-                    </div>
-                    <div className="input-div">
-                        <div className="input-heading">
-                            <i className="fas fa-lock"></i>
-                            <h5>Password</h5>
-                        </div>
-                        <input
-                            onChange={(e) => handle(e)}
-                            type="password"
-                            placeholder="********"
-                            id="password"
-                            name="password"
-                        />
-                    </div>
-                    <div className="input-div">
-                        <div className="input-heading" style={{ margin: "1rem 0", }}>
-                            <i className="fas fa-key"></i>
-                            <h5>User Type</h5>
-                            <select id="user-type" name="type" onChange={() => { setType(!type) }} style={{ padding: '0.5rem', backgroundColor: 'white' }}>
-                                <option value="patient">Patient</option>
-                                <option value="doctor">Doctor</option>
-                            </select>
-                        </div>
-                    </div>
-                    <p style={{ textAlign: "right" }}>Forgot password?</p>
-                </div>
-
-                <input
-                    type="button"
-                    className="btn"
-                    value="Log In"
-                    onClick={() => { login(type) }}
-                />
-                <p style={{ textAlign: "right" }}>Don't have an account?
-                    <Link style={{ marginLeft: "4px", color: "black", textDecoration: "underline" }} to='/signup'>Sign Up.</Link>
-                </p>
-            </form>
-        </div>
-    );
+  return (
+    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-teal-400 text-white p-6">
+      <div className="bg-white text-gray-900 shadow-lg rounded-lg p-8 max-w-md w-full text-center">
+        <h2 className="text-2xl font-semibold mb-4">Login with MetaMask</h2>
+        {loading ? (
+          <p className="text-lg font-medium text-gray-600">Connecting...</p>
+        ) : account ? (
+          <p className="text-lg font-medium">Connected as: <span className="text-blue-600">{account}</span></p>
+        ) : (
+          <button 
+            onClick={connectWallet} 
+            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition duration-300">
+            Connect Wallet
+          </button>
+        )}
+        {error && <p className="text-red-500 mt-4">{error}</p>}
+      </div>
+    </div>
+  );
 };
 
-export default Login;
+export default Auth;
