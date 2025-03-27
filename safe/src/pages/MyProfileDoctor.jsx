@@ -24,8 +24,9 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
 } from "@mui/icons-material";
+import Sidebar2 from "../components/Sidebar2";
 
-const MyProfile = () => {
+const MyProfileDoctor = () => {
   const web3 = new Web3(window.ethereum);
   const mycontract = new web3.eth.Contract(
     contract["abi"],
@@ -37,15 +38,15 @@ const MyProfile = () => {
     lastName: "",
     email: "",
     phone: "",
-    dateOfBirth: "",
-    gender: "",
-    bloodGroup: "",
-    height: "",
-    weight: "",
-    emergencyContactName: "",
-    emergencyContactPhone: "",
-    address: "",
-    medicalAlerts: "",
+    medicalLicense: "",
+    specialization: "",
+    yearsOfExperience: "",
+    qualifications: "",
+    consultationFee: "",
+    hospitalAffiliation: "",
+    workingHours: "",
+    languages: "",
+    professionalSummary: "",
   });
   const [editMode, setEditMode] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
@@ -53,40 +54,35 @@ const MyProfile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      console.log("Fetching profile for:", cookies.name); // Debugging
-
       try {
         const hash = cookies["hash"];
         const res = await fetch(`http://localhost:8080/ipfs/${hash}`);
         const data = await res.json();
 
-        // Set cookies first using fetched data (not state)
-        setCookie("name", data.name || "User");
-        setCookie("email", data.mail || "");
-
-        // Update profile state
+        // Map existing data to new profile structure
         setProfile({
           firstName: data.name?.split(" ")[0] || "",
           lastName: data.name?.split(" ")[1] || "",
           email: data.mail || "",
           phone: data.phone || "",
-          dateOfBirth: data.dateOfBirth || "",
-          gender: data.gender || "",
-          bloodGroup: data.bloodGroup || "",
-          height: data.height || "",
-          weight: data.weight || "",
-          emergencyContactName: data.emergencyContactName || "",
-          emergencyContactPhone: data.emergencyContactPhone || "",
-          address: data.address || "",
-          medicalAlerts: data.medicalAlerts || "",
+          medicalLicense: data.medicalLicense || "",
+          specialization: data.specialization || "",
+          yearsOfExperience: data.yearsOfExperience || "",
+          qualifications: data.qualifications || "",
+          consultationFee: data.consultationFee || "",
+          hospitalAffiliation: data.hospitalAffiliation || "",
+          workingHours: data.workingHours || "",
+          languages: data.languages || "",
+          professionalSummary: data.professionalSummary || "",
         });
+        setCookie("name", `${data.firstName} ${data.lastName}`);
+        setCookie("email", data.email);
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }
     };
-
     fetchProfile();
-  }, [setCookie]); // Include `setCookie` in dependencies
+  }, []);
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -116,26 +112,25 @@ const MyProfile = () => {
         name: `${profile.firstName} ${profile.lastName}`,
         mail: profile.email,
         phone: profile.phone,
-        dateOfBirth: profile.dateOfBirth,
-        gender: profile.gender,
-        bloodGroup: profile.bloodGroup,
-        height: profile.height,
-        weight: profile.weight,
-        emergencyContactName: profile.emergencyContactName,
-        emergencyContactPhone: profile.emergencyContactPhone,
-        address: profile.address,
-        medicalAlerts: profile.medicalAlerts,
+        medicalLicense: profile.medicalLicense,
+        specialization: profile.specialization,
+        yearsOfExperience: profile.yearsOfExperience,
+        qualifications: profile.qualifications,
+        consultationFee: profile.consultationFee,
+        hospitalAffiliation: profile.hospitalAffiliation,
+        workingHours: profile.workingHours,
+        languages: profile.languages,
+        professionalSummary: profile.professionalSummary,
       };
 
       const { cid } = await client.add(JSON.stringify(updatedData));
       const hash = cid.toString();
-      await mycontract.methods.addPatient(hash).send({ from: accounts[0] });
+      await mycontract.methods.addDoctor(hash).send({ from: accounts[0] });
       setCookie("hash", hash);
 
       setEditMode(false);
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile. Please try again.");
     }
   };
 
@@ -151,16 +146,12 @@ const MyProfile = () => {
   return (
     <div className="flex relative dark:bg-main-dark-bg">
       <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white">
-        <Sidebar />
+        <Sidebar2 />
       </div>
       <div className="dark:bg-main-dark-bg bg-main-bg min-h-screen ml-72 w-full">
         <Navbar />
         <div className="p-6 md:p-10">
           <Paper elevation={3} sx={{ p: 4, maxWidth: 800, margin: "auto" }}>
-            <Typography variant="h4" gutterBottom>
-              My Profile
-            </Typography>
-
             <Grid container spacing={3}>
               {/* Profile Image */}
               <Grid
@@ -195,7 +186,7 @@ const MyProfile = () => {
                 )}
               </Grid>
 
-              {/* Profile Details */}
+              {/* Personal Details */}
               <Grid item xs={12} sm={8}>
                 <Grid container spacing={2}>
                   {[
@@ -204,15 +195,24 @@ const MyProfile = () => {
                     { name: "email", label: "Email", type: "email" },
                     { name: "phone", label: "Phone", type: "tel" },
                     {
-                      name: "gender",
-                      label: "Gender",
-                      type: "select",
-                      options: ["Male", "Female", "Other"],
+                      name: "medicalLicense",
+                      label: "Medical License Number",
+                      type: "text",
                     },
                     {
-                      name: "dateOfBirth",
-                      label: "Date of Birth",
-                      type: "date",
+                      name: "specialization",
+                      label: "Medical Specialization",
+                      type: "select",
+                      options: [
+                        "General Practitioner",
+                        "Cardiologist",
+                        "Pediatrician",
+                        "Neurologist",
+                        "Orthopedic Surgeon",
+                        "Dermatologist",
+                        "Oncologist",
+                        "Other",
+                      ],
                     },
                   ].map((field) => (
                     <Grid item xs={12} sm={6} key={field.name}>
@@ -225,9 +225,6 @@ const MyProfile = () => {
                         onChange={handleChange}
                         disabled={!editMode}
                         variant="outlined"
-                        InputLabelProps={{
-                          shrink: field.type === "date" ? true : undefined,
-                        }}
                         select={field.type === "select"}
                       >
                         {field.type === "select" &&
@@ -243,25 +240,34 @@ const MyProfile = () => {
               </Grid>
             </Grid>
 
-            {/* Medical Details */}
+            {/* Professional Details */}
             <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
-              Medical Information
+              Professional Information
             </Typography>
             <Grid container spacing={2}>
               {[
                 {
-                  name: "bloodGroup",
-                  label: "Blood Group",
-                  type: "select",
-                  options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+                  name: "yearsOfExperience",
+                  label: "Years of Experience",
+                  type: "number",
                 },
-                { name: "height", label: "Height (cm)", type: "number" },
-                { name: "weight", label: "Weight (kg)", type: "number" },
                 {
-                  name: "medicalAlerts",
-                  label: "Medical Alerts",
+                  name: "qualifications",
+                  label: "Qualifications",
                   type: "text",
                 },
+                {
+                  name: "consultationFee",
+                  label: "Consultation Fee (₹)",
+                  type: "number",
+                },
+                {
+                  name: "hospitalAffiliation",
+                  label: "Hospital Affiliation",
+                  type: "text",
+                },
+                { name: "workingHours", label: "Working Hours", type: "text" },
+                { name: "languages", label: "Languages", type: "text" },
               ].map((field) => (
                 <Grid item xs={12} sm={6} key={field.name}>
                   <TextField
@@ -273,62 +279,26 @@ const MyProfile = () => {
                     onChange={handleChange}
                     disabled={!editMode}
                     variant="outlined"
-                    select={field.type === "select"}
-                  >
-                    {field.type === "select" &&
-                      field.options.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                  </TextField>
+                  />
                 </Grid>
               ))}
             </Grid>
 
-            {/* Emergency Contact */}
+            {/* Professional Summary */}
             <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
-              Emergency Contact
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  name="emergencyContactName"
-                  label="Emergency Contact Name"
-                  value={profile.emergencyContactName}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  name="emergencyContactPhone"
-                  label="Emergency Contact Phone"
-                  value={profile.emergencyContactPhone}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  variant="outlined"
-                />
-              </Grid>
-            </Grid>
-
-            {/* Address */}
-            <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
-              Address
+              Professional Summary
             </Typography>
             <TextField
               fullWidth
-              name="address"
-              label="Full Address"
-              value={profile.address}
+              name="professionalSummary"
+              label="Professional Summary"
+              value={profile.professionalSummary}
               onChange={handleChange}
               disabled={!editMode}
               variant="outlined"
               multiline
-              rows={3}
+              rows={4}
+              placeholder="Briefly describe your professional background, expertise, and approach to patient care"
             />
 
             {/* Edit/Save Buttons */}
@@ -395,4 +365,4 @@ const MyProfile = () => {
   );
 };
 
-export default MyProfile;
+export default MyProfileDoctor;

@@ -52,12 +52,12 @@ const Auth = () => {
       let userHash = null;
       let userType = null;
 
-      if (doctorCIDs.length > 0) {
+      if (doctorCIDs) {
         userHash = doctorCIDs; // Latest doctor record
         userType = "doctor";
       }
       // Check for the latest patient CID
-      else if (patientCIDs.length > 0) {
+      else if (patientCIDs) {
         userHash = patientCIDs; // Latest patient record
         userType = "patient";
       } 
@@ -71,6 +71,7 @@ const Auth = () => {
 
       // Save the latest CID in cookies
       setCookie("hash", userHash, { path: "/" });
+      setCookie("userType", userType);
 
       // Navigate based on user role
       setUserType(userType);
