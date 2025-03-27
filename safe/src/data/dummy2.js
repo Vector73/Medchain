@@ -9,7 +9,8 @@ export const links = [
     title: 'Dashboard',
     links: [
       {
-        name: 'my profile doc',
+        name: 'doctor-dashboard',
+        title: 'My Profile',
         icon: <CgProfile />,
       },
     ],

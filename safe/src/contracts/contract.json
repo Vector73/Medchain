@@ -1,15 +1,28 @@
 {
-  "address": "0xC2C5471ca6000fBafB6a42B76ccefe017Be165d8",
+  "address": "0xE1509BCa7f7b8e62d61c9b15B495c7b705c10707",
   "abi": [
     {
       "inputs": [
         {
           "internalType": "string",
-          "name": "doc_cid",
+          "name": "_cid",
           "type": "string"
         }
       ],
       "name": "addDoctor",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_cid",
+          "type": "string"
+        }
+      ],
+      "name": "addPatient",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -37,19 +50,6 @@
     {
       "inputs": [
         {
-          "internalType": "string",
-          "name": "patient_cid",
-          "type": "string"
-        }
-      ],
-      "name": "addPatient",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "address",
           "name": "patientAddress",
           "type": "address"
@@ -61,6 +61,34 @@
           "internalType": "string",
           "name": "",
           "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "getPatients",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "getDoctors",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
         }
       ],
       "stateMutability": "view",

@@ -31,7 +31,6 @@ const Register = () => {
       
       try {
         // Check if user already exists
-        console.log("running")
         userHash = await myContract.methods.getPatient(accounts[0]).call();
         console.log(userHash)
       } catch (error) {

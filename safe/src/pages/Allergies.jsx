@@ -401,6 +401,7 @@ const Allergies = () => {
           borderRadius: "10px", 
           boxShadow: 24 
         }}>
+        <SimpleBar style={{ maxHeight: "80vh" }}>
           {selectedRecord && (
             <>
               <Typography variant="h5" sx={{ mb: 3, fontWeight: "bold" }}>
@@ -470,6 +471,7 @@ const Allergies = () => {
               </Box>
             </>
           )}
+        </SimpleBar>
         </Box>
       </Modal>
     </div>

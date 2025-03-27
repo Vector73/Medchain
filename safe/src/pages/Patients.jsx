@@ -7,52 +7,88 @@ import { useCookies } from "react-cookie";
 import { create } from "ipfs-http-client";
 
 const Patients = () => {
-    const web3 = new Web3(window.ethereum);
-    const mycontract = new web3.eth.Contract(contract["abi"], contract["address"]);
+    const [web3, setWeb3] = useState(null);
+    const [myContract, setMyContract] = useState(null);
     const [patients, setPatients] = useState([]);
     const [cookies] = useCookies();
+    const [currentDoctorAddress, setCurrentDoctorAddress] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function initWeb3() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    const web3Instance = new Web3(window.ethereum);
+                    const contractInstance = new web3Instance.eth.Contract(contract["abi"], contract["address"]);
+                    
+                    setWeb3(web3Instance);
+                    setMyContract(contractInstance);
+                    setCurrentDoctorAddress(accounts[0]);
+                } catch (error) {
+                    console.error("Error initializing Web3:", error);
+                    setLoading(false);
+                }
+            }
+        }
+
+        initWeb3();
+    }, []);
 
     useEffect(() => {
         async function getPatients() {
-            try {
-                console.log("🔄 Fetching patients from blockchain...");
-                const res = await mycontract.methods.getPatient().call();
-                console.log("✅ Raw Patient Data from Blockchain:", res);
+            if (!myContract || !currentDoctorAddress) return;
 
+            try {
+                setLoading(true);
+                const patientAddresses = await myContract.methods.getPatients().call();
                 const pat = [];
                 const vis = new Set();
 
-                for (let i = res.length - 1; i >= 0; i--) {
-                    console.log(`🌍 Fetching IPFS data: http://localhost:8080/ipfs/${res[i]}`);
-
-                    const response = await fetch(`http://localhost:8080/ipfs/${res[i]}`);
+                for (let i = patientAddresses.length - 1; i >= 0; i--) {
+                    const patientAddress = patientAddresses[i];
+                    const patientCID = await myContract.methods.getPatient(patientAddress).call();
+                    
+                    const response = await fetch(`http://localhost:8080/ipfs/${patientCID}`);
                     if (!response.ok) {
-                        console.error(`❌ Failed to fetch patient ${res[i]} from IPFS`);
+                        console.error(`❌ Failed to fetch patient ${patientCID} from IPFS`);
                         continue;
                     }
 
                     const data = await response.json();
-                    console.log("📄 Fetched Patient Data from IPFS:", data);
 
-                    if (data.mail && !vis.has(data.mail)) {
+                    // Check if patient is not already treated by this doctor
+                    const isTreatedByCurrentDoctor = data.treatedBy && data.treatedBy.some(
+                        treatment => treatment.doctorAddress.toLowerCase() === currentDoctorAddress.toLowerCase()
+                    );
+
+                    // Only add patients that are either assigned or not treated by current doctor
+                    if (
+                        (!isTreatedByCurrentDoctor) && 
+                        data.selectedDoctors && 
+                        data.selectedDoctors.some(doc => 
+                            doc.toLowerCase() === currentDoctorAddress.toLowerCase()
+                        ) && 
+                        data.mail && 
+                        !vis.has(data.mail)
+                    ) {
                         vis.add(data.mail);
-
-                        if (data.selectedDoctors && data.selectedDoctors.includes(cookies["hash"])) {
-                            data["hash"] = res[i]; // Add IPFS hash to patient data
-                            pat.push(data);
-                        }
+                        data["hash"] = patientCID;
+                        pat.push(data);
                     }
                 }
 
                 console.log("✅ Final Processed Patients List:", pat);
                 setPatients(pat);
+                setLoading(false);
             } catch (error) {
                 console.error("❌ Error fetching patients:", error);
+                setLoading(false);
             }
         }
 
         getPatients();
-    }, []);
+    }, [myContract, currentDoctorAddress]);
 
     function view(phash) {
         window.location.href = `/patientData/${phash}`;
@@ -62,7 +98,7 @@ const Patients = () => {
         try {
             console.log(`🛠 Updating treatment status for patient ${phash}`);
             const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-            const currentaddress = accounts[0];
+            const currentAddress = accounts[0];
 
             const response = await fetch(`http://localhost:8080/ipfs/${phash}`);
             if (!response.ok) {
@@ -74,7 +110,16 @@ const Patients = () => {
             console.log("📄 Patient Data Before Update:", data);
 
             // Remove current doctor from selectedDoctors
-            data.selectedDoctors = data.selectedDoctors.filter(doc => doc !== cookies["hash"]);
+            data.selectedDoctors = data.selectedDoctors.filter(
+                doc => doc.toLowerCase() !== currentAddress.toLowerCase()
+            );
+
+            // Add a treated status to track treatment
+            data.treatedBy = data.treatedBy || [];
+            data.treatedBy.push({
+                [currentAddress]: new Date().toISOString()
+            });
+
             console.log("✂️ Updated Patient Data:", data);
 
             const client = create(new URL("http://127.0.0.1:5001"));
@@ -83,15 +128,11 @@ const Patients = () => {
 
             console.log(`✅ New IPFS Hash: ${hash}`);
 
-            await mycontract.methods.addPatient(hash).send({ from: currentaddress });
+            await myContract.methods.addPatient(hash).send({ from: currentAddress });
 
-            // ✅ FIX: Update State Correctly
-            setPatients(prevPatients =>
-                prevPatients.map(patient =>
-                    patient.hash === phash
-                        ? { ...patient, selectedDoctors: [], hash } // Mark as treated in UI
-                        : patient
-                )
+            // Remove the patient from the current list
+            setPatients(prevPatients => 
+                prevPatients.filter(patient => patient.hash !== phash)
             );
         } catch (err) {
             console.error("❌ Error in treated():", err);
@@ -120,7 +161,7 @@ const Patients = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
                     {patients.length === 0 ? (
                         <div className="col-span-full text-center text-gray-500 dark:text-gray-400">
-                            No Patients Found
+                            No Patients Assigned
                         </div>
                     ) : (
                         patients.map((patient, index) => (
@@ -134,15 +175,6 @@ const Patients = () => {
                                         onClick={() => view(patient.hash)}
                                     >
                                         View Details
-                                    </button>
-                                    <button 
-                                        className={`px-4 py-2 rounded-lg transition text-white ${
-                                            patient.selectedDoctors.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
-                                        }`}
-                                        onClick={() => treated(patient.hash)}
-                                        disabled={patient.selectedDoctors.length === 0}
-                                    >
-                                        {patient.selectedDoctors.length === 0 ? "Treated ✅" : "Mark as Treated"}
                                     </button>
                                 </div>
                             </div>

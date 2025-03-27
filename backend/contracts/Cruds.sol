@@ -2,22 +2,62 @@
 pragma solidity ^0.8.19;
 
 contract Cruds {
-    mapping(address => string) private patientCIDs;  // Maps a patient address to an array of CIDs
-    mapping(address => string) private doctorCIDs;     // Maps a doctor address to a single CID
+    mapping(address => string) private patientCIDs;
+    mapping(address => string) private doctorCIDs;
+    address[] private patients;
+    address[] private doctors;
 
-    function addDoctor(string memory doc_cid) public {
-        doctorCIDs[msg.sender] = doc_cid;  // Each doctor has a unique CID
+    function addDoctor(string memory _cid) public {
+        // Check if the doctor is not already in the array
+        bool exists = false;
+        for (uint i = 0; i < doctors.length; i++) {
+            if (doctors[i] == msg.sender) {
+                exists = true;
+                break;
+            }
+        }
+
+        // If the doctor doesn't exist, add to the array
+        if (!exists) {
+            doctors.push(msg.sender);
+        }
+        
+        // Update or set the doctor's CID
+        doctorCIDs[msg.sender] = _cid;
+    }
+
+    function addPatient(string memory _cid) public {
+        // Check if the patient is not already in the array
+        bool exists = false;
+        for (uint i = 0; i < patients.length; i++) {
+            if (patients[i] == msg.sender) {
+                exists = true;
+                break;
+            }
+        }
+
+        // If the patient doesn't exist, add to the array
+        if (!exists) {
+            patients.push(msg.sender);
+        }
+        
+        // Update or set the patient's CID
+        patientCIDs[msg.sender] = _cid;
     }
 
     function getDoctor(address doctorAddress) public view returns (string memory) {
-        return doctorCIDs[doctorAddress];  // Get doctor CID by address
-    }
-
-    function addPatient(string memory patient_cid) public {
-        patientCIDs[msg.sender] = patient_cid;  // Append new CID for the patient
+        return doctorCIDs[doctorAddress];
     }
 
     function getPatient(address patientAddress) public view returns (string memory) {
-        return patientCIDs[patientAddress];  // Return all CIDs for a given patient
+        return patientCIDs[patientAddress];
+    }
+
+    function getPatients() public view returns (address[] memory) {
+        return patients;
+    }
+
+    function getDoctors() public view returns (address[] memory) {
+        return doctors;
     }
 }

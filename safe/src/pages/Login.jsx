@@ -52,17 +52,17 @@ const Auth = () => {
       let userHash = null;
       let userType = null;
 
+      if (doctorCIDs.length > 0) {
+        userHash = doctorCIDs; // Latest doctor record
+        userType = "doctor";
+      }
       // Check for the latest patient CID
-      if (patientCIDs.length > 0) {
+      else if (patientCIDs.length > 0) {
         userHash = patientCIDs; // Latest patient record
         userType = "patient";
       } 
       
       // Check for the latest doctor CID if not found in patients
-      else if (doctorCIDs.length > 0) {
-        userHash = doctorCIDs[doctorCIDs.length - 1]; // Latest doctor record
-        userType = "doctor";
-      }
 
       if (!userHash) {
         setError("User not found. Please register first.");

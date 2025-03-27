@@ -11,7 +11,8 @@ export const links = [
     title: 'Dashboard',
     links: [
       {
-        name: 'my profile',
+        name: 'patient-dashboard',
+        title: 'My Profile',
         icon: <CgProfile />,
       },
     ],
