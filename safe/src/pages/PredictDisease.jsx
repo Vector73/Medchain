@@ -34,7 +34,7 @@ const Insurance = () => {
       Lethargy: lethargy,
       "Chest Pain": chestpain,
     };
-    await fetch(`http://192.168.1.20:5000/${JSON.stringify(data)}`, {
+    await fetch(`http://localhost:5000/${JSON.stringify(data)}`, {
       // method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const Insurance = () => {
         setDisease(d);
       })
       .catch((error) => {
-        window.alert(error);
+        console.log(error)
         return;
       });
   }

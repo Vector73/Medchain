@@ -359,9 +359,9 @@ const PatientInfo = () => {
       <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white">
         <Sidebar2 />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 ml-72 w-full">
         <Navbar />
-        <div className="ml-72 flex-1 p-8">
+        <div className="flex-1 p-8">
           {/* Section Navigation */}
           <div className="mb-6 bg-white shadow-md rounded-lg overflow-hidden">
             <div className="flex border-b">

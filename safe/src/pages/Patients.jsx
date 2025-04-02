@@ -160,9 +160,9 @@ const Patients = () => {
         <Sidebar2 />
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 ml-72">
         <Navbar />
-        <div className="dark:bg-main-dark-bg bg-main-bg min-h-screen ml-72 w-full p-6">
+        <div className="dark:bg-main-dark-bg bg-main-bg min-h-screen w-full p-6">
           <div className="mt-8">
             <h2 className="text-3xl font-semibold text-gray-800 dark:text-white">
               Patient Records
