@@ -3,15 +3,22 @@ from flask_cors import CORS
 import json
 import numpy as np
 import pandas as pd
+from scipy.stats import mode
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix    
 import pickle
 
+#no need to do this thing lmao
+#
+
 app = Flask(__name__)
-# Allow CORS from any origin for development
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
+cors = CORS(app)
 
 DATA_PATH = "Training.csv"
 data = pd.read_csv(DATA_PATH).dropna(axis = 1)
@@ -37,56 +44,62 @@ data_dict = {
     "predictions_classes":encoder.classes_
 }
 
-# Replace mode with a custom function
-def get_most_common(predictions):
-    """Return the most common prediction"""
-    # Count occurrences of each prediction
-    prediction_counts = {}
-    for pred in predictions:
-        if pred in prediction_counts:
-            prediction_counts[pred] += 1
-        else:
-            prediction_counts[pred] = 1
-    
-    # Find the prediction with the highest count
-    max_count = 0
-    most_common = None
-    for pred, count in prediction_counts.items():
-        if count > max_count:
-            max_count = count
-            most_common = pred
-    
-    return most_common
 
-@app.route('/<s>', methods=['GET'])
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
+
+# @app.route('/change', methods = ['POST'])
+# def change():
+#     #print(request.form)
+#     symptoms = [str(x) for x in request.form.values()]
+#     input_data = [0] * len(data_dict["symptom_index"])
+#     print(input_data)
+#     for symptom in symptoms:
+#         index = data_dict["symptom_index"][symptom]
+#         input_data[index] = 1
+         
+#     input_data = np.array(input_data).reshape(1,-1)
+
+
+#     rf_prediction = data_dict["predictions_classes"][rf_model.predict(input_data)[0]]
+#     nb_prediction = data_dict["predictions_classes"][nb_model.predict(input_data)[0]]
+#     svm_prediction = data_dict["predictions_classes"][svm_model.predict(input_data)[0]]
+
+#     a = list(set([rf_prediction, nb_prediction, svm_prediction]))
+#     final_prediction = ', '.join(a)
+#     return render_template('index1.html', dt1 = final_prediction)
+
+# @app.route('/allergy/<name>')
+# def allergy(name):
+#     data = json.loads(name)
+#     print(data)
+#     return json.dumps('name')
+
+@app.route('/<s>')
 def predict(s):
-    try:
-        s = json.loads(s)
-        symptoms = []
-        for x in s.keys():
-            # Handle multiple boolean representations
-            if s[x] is True or s[x] == "true" or s[x] == "True":
-                symptoms.append(x)
-        
-        input_data = [0] * len(data_dict["symptom_index"])
-        for symptom in symptoms:
-            if symptom in data_dict["symptom_index"]:
-                index = data_dict["symptom_index"][symptom]
-                input_data[index] = 1
-             
-        input_data = np.array(input_data).reshape(1,-1)
+    s = json.loads(s)
+    symptoms = []
+    for x in s.keys():
+        if s[x]:
+            symptoms.append(x)
+    input_data = [0] * len(data_dict["symptom_index"])
+    print(input_data)
+    for symptom in symptoms:
+        index = data_dict["symptom_index"][symptom]
+        input_data[index] = 1
+         
+    input_data = np.array(input_data).reshape(1,-1)
 
-        rf_prediction = data_dict["predictions_classes"][rf_model.predict(input_data)[0]]
-        nb_prediction = data_dict["predictions_classes"][nb_model.predict(input_data)[0]]
-        svm_prediction = data_dict["predictions_classes"][svm_model.predict(input_data)[0]]
-        
-        # Use our custom function instead of scipy's mode
-        final_prediction = get_most_common([rf_prediction, nb_prediction, svm_prediction])
-        
-        return json.dumps(final_prediction)
-    except Exception as e:
-        print(f"Error in prediction: {str(e)}")
-        return json.dumps({"error": str(e)}), 500
+
+    rf_prediction = data_dict["predictions_classes"][rf_model.predict(input_data)[0]]
+    nb_prediction = data_dict["predictions_classes"][nb_model.predict(input_data)[0]]
+    svm_prediction = data_dict["predictions_classes"][svm_model.predict(input_data)[0]]
+    a = list(set([rf_prediction, nb_prediction, svm_prediction]))
+    final_prediction = mode([rf_prediction, nb_prediction, svm_prediction])[0][0]
+    #print(s)
+    return json.dumps(final_prediction)
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug = True, port=5000)

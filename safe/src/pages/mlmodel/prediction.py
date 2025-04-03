@@ -1,22 +1,18 @@
 import numpy as np
 import pandas as pd
-from statistics import mode
+from scipy.stats import mode
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix    
 import pickle
-import pandas as pd
 
-
-TRAINING_DATA_PATH = "Training.csv"
-TESTING_DATA_PATH = "Testing.csv"
-MODEL_OUTPUT_DIR = "./"
-
-data = pd.read_csv(TRAINING_DATA_PATH).dropna(axis = 1)
-
-data = data.fillna(0)
-data = data.dropna(subset=['prognosis'])
+DATA_PATH = "Training.csv"
+data = pd.read_csv(DATA_PATH).dropna(axis = 1)
 
 encoder = LabelEncoder()
 data["prognosis"] = encoder.fit_transform(data["prognosis"])
@@ -66,8 +62,8 @@ def predictDisease(symptoms):
         index = data_dict["symptom_index"][symptom]
         input_data[index] = 1
          
-    input_data = pd.DataFrame([input_data], columns=data_dict["symptom_index"].keys())
-
+    input_data = np.array(input_data).reshape(1,-1)
+     
     rf_prediction = data_dict["predictions_classes"][rf_model.predict(input_data)[0]]
     nb_prediction = data_dict["predictions_classes"][nb_model.predict(input_data)[0]]
     svm_prediction = data_dict["predictions_classes"][svm_model.predict(input_data)[0]]
