@@ -75,7 +75,10 @@ const MyProfileDoctor = () => {
           languages: data.languages || "",
           professionalSummary: data.professionalSummary || "",
         });
-        setCookie("name", `${data.name?.split(" ")[0]} ${data.name?.split(" ")[1]}`);
+        setCookie(
+          "name",
+          `${data.name?.split(" ")[0]} ${data.name?.split(" ")[1]}`,
+        );
         setCookie("email", data.email);
       } catch (error) {
         console.error("Error fetching profile data:", error);

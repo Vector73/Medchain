@@ -4,59 +4,50 @@ import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
 
 const PredictDisease = () => {
-  const [itching, setItching] = useState(false);
-  const [skinrash, setSkinRash] = useState(false);
-  const [shivering, setShivering] = useState(false);
-  const [vomiting, setVomiting] = useState(false);
-  const [stomachache, setStomachAche] = useState(false);
-  const [headache, setHeadAche] = useState(false);
-  const [cough, setCough] = useState(false);
-  const [fever, setFever] = useState(false);
-  const [lethargy, setLethargy] = useState(false);
-  const [chestpain, setChestPain] = useState(false);
+  const [symptoms, setSymptoms] = useState({
+    Itching: false,
+    "Skin Rash": false,
+    Shivering: false,
+    Vomiting: false,
+    "Stomach Pain": false,
+    Headache: false,
+    Cough: false,
+    "High Fever": false,
+    Lethargy: false,
+    "Chest Pain": false,
+  });
 
   const [disease, setDisease] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Convert string "true"/"false" to actual boolean
-  const stringToBoolean = (value) => {
-    return value === "true";
+  const toggleSymptom = (symptom) => {
+    setSymptoms((prev) => ({
+      ...prev,
+      [symptom]: !prev[symptom],
+    }));
   };
 
   async function check() {
     setLoading(true);
     setError("");
     setDisease("");
-    
-    const data = {
-      "Itching": itching,
-      "Skin Rash": skinrash,
-      "Shivering": shivering,
-      "Vomiting": vomiting,
-      "Stomach Pain": stomachache,
-      "Headache": headache,
-      "Cough": cough,
-      "High Fever": fever,
-      "Lethargy": lethargy,
-      "Chest Pain": chestpain,
-    };
-    
+
     // Use localhost instead of hard-coded IP for development
-    const apiUrl = `http://localhost:5000/${encodeURIComponent(JSON.stringify(data))}`;
-    
+    const apiUrl = `http://localhost:5000/${encodeURIComponent(JSON.stringify(symptoms))}`;
+
     try {
       const response = await fetch(apiUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const result = await response.json();
-      
+
       // Check if the result is an error object
       if (result && result.error) {
         throw new Error(result.error);
       }
-      
+
       setDisease(result);
     } catch (error) {
       console.error("Error:", error);
@@ -65,6 +56,23 @@ const PredictDisease = () => {
       setLoading(false);
     }
   }
+
+  // List of symptom questions to display
+  const symptomQuestions = [
+    { key: "Itching", question: "Is there any itching?" },
+    { key: "Skin Rash", question: "Do you have skin rashes?" },
+    { key: "Shivering", question: "Are you shivering?" },
+    { key: "Vomiting", question: "Do you feel vomiting?" },
+    { key: "Stomach Pain", question: "Do you feel stomachache?" },
+    { key: "Headache", question: "Do you feel headache?" },
+    {
+      key: "Cough",
+      question: "Do you have cold, cough and feel like sneezing?",
+    },
+    { key: "High Fever", question: "Do you have fever?" },
+    { key: "Lethargy", question: "Do you feel tired?" },
+    { key: "Chest Pain", question: "Do you have chest pain?" },
+  ];
 
   return (
     <div className="flex relative dark:bg-main-dark-bg">
@@ -76,256 +84,69 @@ const PredictDisease = () => {
         <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
           <Navbar />
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            padding: "4rem",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "1rem",
-          }}
-        >
-          <h1>Not Feeling Well?</h1>
-          <p>
+        <div className="flex flex-col p-8 md:p-16 items-center">
+          <h1 className="text-3xl font-bold mb-2">Not Feeling Well?</h1>
+          <p className="text-lg text-center max-w-2xl mb-8">
             Answer the following questions for a quick diagnosis for your
             health. Yes, Medchain is here.
           </p>
+
           <form
-            style={{
-              width: "60%",
-              margin: "2rem",
-              gap: "1rem",
-              display: "flex",
-              flexDirection: "column",
-            }}
+            className="w-full max-w-2xl bg-white dark:bg-secondary-dark-bg rounded-lg shadow-lg p-6"
             onSubmit={(e) => {
               e.preventDefault();
               check();
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>1.</h2>
-                <h2>Is there any itching?</h2>
-              </div>
-              <select
-                id=""
-                name="Itching"
-                onChange={(e) => setItching(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
+            <div className="space-y-4">
+              {symptomQuestions.map((item, index) => (
+                <div key={item.key} className="border-b pb-4 last:border-b-0">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <span className="font-semibold mr-2">{index + 1}.</span>
+                      <span>{item.question}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleSymptom(item.key)}
+                      className={`px-4 py-2 rounded-full transition-colors duration-200 font-medium ${
+                        symptoms[item.key]
+                          ? "bg-emerald-500 text-white"
+                          : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      }`}
+                    >
+                      {symptoms[item.key] ? "Yes" : "No"}
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>2.</h2>
-                <h2>Do you have skin rashes?</h2>
-              </div>
-              <select
-                id=""
-                name="Skin Rash"
-                onChange={(e) => setSkinRash(stringToBoolean(e.target.value))}
+
+            <div className="mt-8">
+              <button
+                className={`w-full py-3 rounded-md font-medium text-white transition-colors ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-cyan-500 hover:bg-cyan-600"
+                }`}
+                type="submit"
+                disabled={loading}
               >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
+                {loading ? "Processing..." : "Get Diagnosis"}
+              </button>
             </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>3.</h2>
-                <h2>Are you shivering?</h2>
-              </div>
-              <select
-                id=""
-                name="Shivering"
-                onChange={(e) => setShivering(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>4.</h2>
-                <h2>Do you feel vomiting?</h2>
-              </div>
-              <select
-                id=""
-                name="Vomiting"
-                onChange={(e) => setVomiting(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>5.</h2>
-                <h2>Do you feel stomachache?</h2>
-              </div>
-              <select
-                id=""
-                name="Stomach Pain"
-                onChange={(e) => setStomachAche(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>6.</h2>
-                <h2>Do you feel headache?</h2>
-              </div>
-              <select
-                id=""
-                name="Headache"
-                onChange={(e) => setHeadAche(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>7.</h2>
-                <h2>Do you have cold, cough and feel like sneezing?</h2>
-              </div>
-              <select
-                id=""
-                name="Cough"
-                onChange={(e) => setCough(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>8.</h2>
-                <h2>Do you have fever?</h2>
-              </div>
-              <select
-                id=""
-                name="High Fever"
-                onChange={(e) => setFever(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>9.</h2>
-                <h2>Do you feel tired?</h2>
-              </div>
-              <select
-                id=""
-                name="Lethargy"
-                onChange={(e) => setLethargy(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", gap: "4px" }}>
-                <h2>10.</h2>
-                <h2>Do you have chest pain?</h2>
-              </div>
-              <select
-                id=""
-                name="Chest Pain"
-                onChange={(e) => setChestPain(stringToBoolean(e.target.value))}
-              >
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-              </select>
-            </div>
-            <button
-              style={{
-                marginTop: "1rem",
-                backgroundColor: "rgb(3, 201, 215)",
-                padding: "8px 12px",
-                borderRadius: "4px",
-                color: "white",
-                cursor: loading ? "not-allowed" : "pointer"
-              }}
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? "Processing..." : "Submit"}
-            </button>
+
             {error && (
-              <div style={{ marginTop: "1rem", color: "red" }}>
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
                 {error}
               </div>
             )}
+
             {disease && (
-              <div style={{ marginTop: "2rem", fontWeight: "bold" }}>
-                Predicted Diagnosis: {disease}
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-md">
+                <h3 className="text-xl font-bold mb-1">Predicted Diagnosis:</h3>
+                <p className="text-lg">{disease}</p>
               </div>
             )}
           </form>

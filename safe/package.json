@@ -19,6 +19,8 @@
     "@syncfusion/ej2-react-schedule": "^19.4.50",
     "ipfs-http-client": "^52.0.4-rc.4",
     "lucide-react": "^0.483.0",
+    "pdf-lib": "^1.17.1",
+    "prettier": "^3.5.3",
     "react": "^17.0.2",
     "react-cookie": "^4.1.1",
     "react-dom": "^17.0.2",
