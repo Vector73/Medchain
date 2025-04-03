@@ -1,13 +1,9 @@
-import React, { useState, Fragment } from "react";
-import { nanoid } from "nanoid";
-import Web3 from "web3";
+import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
-import { useCookies } from "react-cookie";
-import { FaEvernote } from "react-icons/fa";
 
-const Insurance = () => {
+const PredictDisease = () => {
   const [itching, setItching] = useState(false);
   const [skinrash, setSkinRash] = useState(false);
   const [shivering, setShivering] = useState(false);
@@ -19,50 +15,65 @@ const Insurance = () => {
   const [lethargy, setLethargy] = useState(false);
   const [chestpain, setChestPain] = useState(false);
 
-  const [disease, setDisease] = useState();
+  const [disease, setDisease] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Convert string "true"/"false" to actual boolean
+  const stringToBoolean = (value) => {
+    return value === "true";
+  };
 
   async function check() {
+    setLoading(true);
+    setError("");
+    setDisease("");
+    
     const data = {
-      Itching: itching,
+      "Itching": itching,
       "Skin Rash": skinrash,
-      Shivering: shivering,
-      Vomiting: vomiting,
+      "Shivering": shivering,
+      "Vomiting": vomiting,
       "Stomach Pain": stomachache,
-      Headache: headache,
-      Cough: cough,
+      "Headache": headache,
+      "Cough": cough,
       "High Fever": fever,
-      Lethargy: lethargy,
+      "Lethargy": lethargy,
       "Chest Pain": chestpain,
     };
-    await fetch(`http://localhost:5000/${JSON.stringify(data)}`, {
-      // method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // body: JSON.stringify(newPerson),
-    })
-      .then((res) => res.json())
-      .then((d) => {
-        setDisease(d);
-      })
-      .catch((error) => {
-        console.log(error)
-        return;
-      });
+    
+    // Use localhost instead of hard-coded IP for development
+    const apiUrl = `http://localhost:5000/${encodeURIComponent(JSON.stringify(data))}`;
+    
+    try {
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const result = await response.json();
+      
+      // Check if the result is an error object
+      if (result && result.error) {
+        throw new Error(result.error);
+      }
+      
+      setDisease(result);
+    } catch (error) {
+      console.error("Error:", error);
+      setError(`Failed to get diagnosis: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="flex relative dark:bg-main-dark-bg">
-      <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
+      <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white">
         <Sidebar />
       </div>
 
-      <div
-        className={
-          "dark:bg-main-dark-bg  bg-main-bg min-h-screen ml-72 w-full  "
-        }
-      >
-        <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
+      <div className="dark:bg-main-dark-bg bg-main-bg min-h-screen ml-72 w-full">
+        <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
           <Navbar />
         </div>
         <div
@@ -88,6 +99,10 @@ const Insurance = () => {
               display: "flex",
               flexDirection: "column",
             }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              check();
+            }}
           >
             <div
               style={{
@@ -103,7 +118,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="Itching"
-                onChange={(e) => setItching(e.target.value)}
+                onChange={(e) => setItching(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -123,7 +138,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="Skin Rash"
-                onChange={(e) => setSkinRash(e.target.value)}
+                onChange={(e) => setSkinRash(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -143,7 +158,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="Shivering"
-                onChange={(e) => setShivering(e.target.value)}
+                onChange={(e) => setShivering(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -163,7 +178,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="Vomiting"
-                onChange={(e) => setVomiting(e.target.value)}
+                onChange={(e) => setVomiting(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -183,7 +198,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="Stomach Pain"
-                onChange={(e) => setStomachAche(e.target.value)}
+                onChange={(e) => setStomachAche(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -203,7 +218,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="Headache"
-                onChange={(e) => setHeadAche(e.target.value)}
+                onChange={(e) => setHeadAche(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -223,7 +238,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="Cough"
-                onChange={(e) => setCough(e.target.value)}
+                onChange={(e) => setCough(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -243,7 +258,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="High Fever"
-                onChange={(e) => setFever(e.target.value)}
+                onChange={(e) => setFever(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -263,7 +278,7 @@ const Insurance = () => {
               <select
                 id=""
                 name="Lethargy"
-                onChange={(e) => setLethargy(e.target.value)}
+                onChange={(e) => setLethargy(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -283,27 +298,36 @@ const Insurance = () => {
               <select
                 id=""
                 name="Chest Pain"
-                onChange={(e) => setChestPain(e.target.value)}
+                onChange={(e) => setChestPain(stringToBoolean(e.target.value))}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
               </select>
             </div>
-            <input
+            <button
               style={{
                 marginTop: "1rem",
                 backgroundColor: "rgb(3, 201, 215)",
                 padding: "8px 12px",
                 borderRadius: "4px",
                 color: "white",
+                cursor: loading ? "not-allowed" : "pointer"
               }}
-              type="button"
-              value="Submit"
-              onClick={check}
-            />
-            <div style={{ marginTop: "2rem" }}>
-              Predicted Diagnosis: {disease}
-            </div>
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Submit"}
+            </button>
+            {error && (
+              <div style={{ marginTop: "1rem", color: "red" }}>
+                {error}
+              </div>
+            )}
+            {disease && (
+              <div style={{ marginTop: "2rem", fontWeight: "bold" }}>
+                Predicted Diagnosis: {disease}
+              </div>
+            )}
           </form>
         </div>
         <Footer />
@@ -312,4 +336,4 @@ const Insurance = () => {
   );
 };
 
-export default Insurance;
+export default PredictDisease;
