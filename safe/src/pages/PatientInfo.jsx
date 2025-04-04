@@ -268,7 +268,7 @@ const PatientInfo = () => {
       icon: ShieldCheck,
       content: () => (
         <PaginatedTable
-          data={patient.insurance || []}
+          data={patient.insuranceRecords || []}
           columns={[
             "Provider",
             "Policy Number",
@@ -337,7 +337,7 @@ const PatientInfo = () => {
       icon: Stethoscope,
       content: () => (
         <PaginatedTable
-          data={patient.visit || []}
+          data={patient.checkuphistory || []}
           columns={[
             "Checkup Type",
             "Date",

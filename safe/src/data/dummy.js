@@ -55,7 +55,7 @@ export const links = [
       },
       {
         name: "pdf",
-        tile: "Download PDF",
+        title: "Download PDF",
         icon: <Description />,
       },
     ],
