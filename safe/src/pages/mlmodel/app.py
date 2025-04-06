@@ -29,8 +29,7 @@ symptoms = X.columns.values
  
 symptom_index = {}
 for index, value in enumerate(symptoms):
-    symptom = " ".join([i.capitalize() for i in value.split("_")])
-    symptom_index[symptom] = index
+    symptom_index[value] = index
  
 data_dict = {
     "symptom_index":symptom_index,
