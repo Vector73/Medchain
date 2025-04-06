@@ -1,5 +1,5 @@
 {
-  "address": "0xE1509BCa7f7b8e62d61c9b15B495c7b705c10707",
+  "address": "0x8a3b80a7a64E4c22e36bC21b987E9Ef1F5342Dc0",
   "abi": [
     {
       "inputs": [
@@ -44,8 +44,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -64,8 +63,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -78,8 +76,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -92,8 +89,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
   ]
 }

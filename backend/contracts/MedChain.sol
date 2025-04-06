@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract Cruds {
+contract MedChain {
     mapping(address => string) private patientCIDs;
     mapping(address => string) private doctorCIDs;
     address[] private patients;

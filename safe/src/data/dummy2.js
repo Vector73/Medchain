@@ -24,14 +24,14 @@ export const links = [
     ],
   },
   {
-      title: "Services",
-      links: [
-        {
-          name: "predict disease",
-          icon: <MdOutlineMedicalServices />,
-        },
-      ],
-    },
+    title: "Services",
+    links: [
+      {
+        name: "predict disease",
+        icon: <MdOutlineMedicalServices />,
+      },
+    ],
+  },
 ];
 
 export const themeColors = [

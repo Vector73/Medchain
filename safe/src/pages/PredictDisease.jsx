@@ -155,7 +155,7 @@ const PredictDisease = () => {
   }, {});
 
   const [symptoms, setSymptoms] = useState(initialSymptomState);
-  const [cookies, setCookies] = useCookies()
+  const [cookies, setCookies] = useCookies();
   const [inputValue, setInputValue] = useState("");
   const [filteredSymptoms, setFilteredSymptoms] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -168,7 +168,7 @@ const PredictDisease = () => {
   const dropdownRef = useRef(null);
 
   const selectedSymptoms = Object.keys(symptoms).filter(
-    (symptom) => symptoms[symptom]
+    (symptom) => symptoms[symptom],
   );
 
   useEffect(() => {
@@ -185,14 +185,13 @@ const PredictDisease = () => {
           symptom
             .replace(/_/g, " ")
             .toLowerCase()
-            .includes(inputValue.toLowerCase())
+            .includes(inputValue.toLowerCase()),
       )
       .slice(0, 10); // Limit to 10 results for better performance
 
     setFilteredSymptoms(filtered);
     setShowDropdown(filtered.length > 0);
   }, [inputValue, symptoms]);
-
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -206,7 +205,6 @@ const PredictDisease = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
 
   const handleSelectSymptom = (symptom) => {
     setSymptoms((prev) => ({
@@ -241,14 +239,14 @@ const PredictDisease = () => {
     setDisease("");
 
     const apiUrl = `http://localhost:5000/${encodeURIComponent(JSON.stringify(selectedSymptoms))}`;
-    
+
     try {
       const response = await fetch(apiUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const result = await response.json();
-      
+
       if (result && result.error) {
         throw new Error(result.error);
       }
@@ -296,7 +294,7 @@ const PredictDisease = () => {
   return (
     <div className="flex relative dark:bg-main-dark-bg">
       <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white">
-      {cookies.userType === "patient" ? <Sidebar /> : <Sidebar2 />}
+        {cookies.userType === "patient" ? <Sidebar /> : <Sidebar2 />}
       </div>
 
       <div className="dark:bg-main-dark-bg bg-main-bg min-h-screen ml-72 w-full">
