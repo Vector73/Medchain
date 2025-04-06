@@ -268,7 +268,7 @@ const PatientInfo = () => {
       icon: ShieldCheck,
       content: () => (
         <PaginatedTable
-          data={patient.insurance || []}
+          data={patient.insuranceRecords || []}
           columns={[
             "Provider",
             "Policy Number",
@@ -337,7 +337,7 @@ const PatientInfo = () => {
       icon: Stethoscope,
       content: () => (
         <PaginatedTable
-          data={patient.visit || []}
+          data={patient.checkuphistory || []}
           columns={[
             "Checkup Type",
             "Date",
@@ -361,7 +361,32 @@ const PatientInfo = () => {
       </div>
       <div className="flex-1 ml-72 w-full">
         <Navbar />
+
         <div className="flex-1 p-8">
+          {/* PDF Button */}
+          <div className="mb-4">
+            <button
+              onClick={() => (window.location.href = `/pdf/${phash}`)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              View PDF
+            </button>
+          </div>
+
           {/* Section Navigation */}
           <div className="mb-6 bg-white shadow-md rounded-lg overflow-hidden">
             <div className="flex border-b">
@@ -370,15 +395,15 @@ const PatientInfo = () => {
                   key={section.key}
                   onClick={() => setActiveSection(section.key)}
                   className={`
-                                    flex items-center justify-center 
-                                    px-4 py-3 w-full 
-                                    ${
-                                      activeSection === section.key
-                                        ? "bg-blue-500 text-white"
-                                        : "text-gray-600 hover:bg-gray-100"
-                                    }
-                                    transition-colors duration-200
-                                `}
+                flex items-center justify-center 
+                px-4 py-3 w-full 
+                ${
+                  activeSection === section.key
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                }
+                transition-colors duration-200
+              `}
                 >
                   <section.icon className="mr-2" size={20} />
                   {section.label}

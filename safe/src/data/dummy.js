@@ -1,7 +1,16 @@
+import {
+  Description,
+  Pages,
+  PagesRounded,
+  Pageview,
+} from "@mui/icons-material";
+import { Paper } from "@mui/material";
+import { PDFAcroButton } from "pdf-lib";
 import React from "react";
 import { BsCurrencyDollar } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { FaAllergies } from "react-icons/fa";
+import { GiPaper } from "react-icons/gi";
 import { IoDocumentOutline } from "react-icons/io5";
 import {
   MdOutlineMeetingRoom,
@@ -43,6 +52,11 @@ export const links = [
       {
         name: "checkup history",
         icon: <MdOutlineMeetingRoom />,
+      },
+      {
+        name: "pdf",
+        title: "Download PDF",
+        icon: <Description />,
       },
     ],
   },

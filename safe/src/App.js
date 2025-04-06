@@ -23,6 +23,7 @@ import PatientInfo from "./pages/PatientInfo";
 import "./App.css";
 
 import { useStateContext } from "./contexts/ContextProvider";
+import PatientPDF from "./pages/Download";
 
 const App = () => {
   const {
@@ -67,7 +68,9 @@ const App = () => {
           <Route path="/checkuphistory" element={<Visits />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/patients" element={<Patients />} />
+          <Route path="/pdf" element={<PatientPDF />} />
           <Route exact path="/patientData/:phash" element={<PatientInfo />} />
+          <Route exact path="/pdf/:phash" element={<PatientPDF />} />
         </Routes>
       </BrowserRouter>
     </div>
