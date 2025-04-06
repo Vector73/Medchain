@@ -156,10 +156,11 @@ const Home = () => {
             </div>
           </div>
         </section>
-
       </main>
       <footer className="footer section">
-        <p className="footer__copy">Design And Developed By Kunal Sharma and Kartik Bhatt</p>
+        <p className="footer__copy">
+          Design And Developed By Kunal Sharma and Kartik Bhatt
+        </p>
         <p className="footer__copy">&#169; Medchain.</p>
       </footer>
     </div>

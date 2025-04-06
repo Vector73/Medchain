@@ -252,7 +252,7 @@ const PredictDisease = () => {
       if (result && result.error) {
         throw new Error(result.error);
       }
-      
+
       setDisease(result);
     } catch (error) {
       console.error("Error:", error);
@@ -380,13 +380,15 @@ const PredictDisease = () => {
             </div>
 
             {error && (
-              <div style={{ marginTop: "1rem", color: "red" }}>
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
                 {error}
               </div>
             )}
+
             {disease && (
-              <div style={{ marginTop: "2rem", fontWeight: "bold" }}>
-                Predicted Diagnosis: {disease}
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-md">
+                <h3 className="text-xl font-bold mb-1">Predicted Diagnosis:</h3>
+                <p className="text-lg">{disease}</p>
               </div>
             )}
           </div>
